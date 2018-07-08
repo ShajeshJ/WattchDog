@@ -11,6 +11,11 @@ namespace WattchDog.Controllers
 {
     public class DataController : ApiController
     {
+        /// <summary>
+        /// testing for codepipeline
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("")]
         public async Task<IHttpActionResult> SendData(MeasuredDataDTO input)
