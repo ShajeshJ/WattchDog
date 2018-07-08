@@ -9,6 +9,7 @@ using WattchDog.Models;
 
 namespace WattchDog.Controllers
 {
+    [RoutePrefix("api/data")]
     public class DataController : ApiController
     {
         /// <summary>
