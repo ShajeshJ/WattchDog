@@ -12,7 +12,7 @@ namespace WattchDog.Controllers
     public class DataController : ApiController
     {
         /// <summary>
-        /// second change
+        /// hopefully last test
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
