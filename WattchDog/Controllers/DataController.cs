@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using WattchDB;
+using WattchDB.Models;
 using WattchDog.Models;
 
 namespace WattchDog.Controllers
@@ -12,11 +14,13 @@ namespace WattchDog.Controllers
     [RoutePrefix("api/data")]
     public class DataController : ApiController
     {
-        /// <summary>
-        /// last one please
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        private IDeviceRepository _deviceRepo;
+
+        public DataController(IDeviceRepository deviceRepo)
+        {
+            _deviceRepo = deviceRepo;
+        }
+
         [HttpPost]
         [Route("")]
         public async Task<IHttpActionResult> SendData(MeasuredDataDTO input)

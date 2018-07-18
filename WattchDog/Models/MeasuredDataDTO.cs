@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using WattchDB.Models;
 
 namespace WattchDog.Models
 {
@@ -36,5 +37,6 @@ namespace WattchDog.Models
     public class MeasuredDataResponse
     {
         public string DeviceStatus { get; set; }
+        public Device Device { get; set; }
     }
 }
