@@ -18,16 +18,7 @@ namespace WattchDog.Controllers
         [Route("")]
         public async Task<IHttpActionResult> SendData(MeasuredDataDTO input)
         {
-            Device result;
-            int num;
-            using (var context = new DatabaseContext())
-            {
-                result = context.Devices.FirstOrDefault();
-                result.Name = "new name";
-                num = context.SaveChanges();
-            }
-
-            return Ok(new MeasuredDataResponse() { DeviceStatus = "on", Device = result, Result = num });
+            return Ok(new MeasuredDataResponse() { DeviceStatus = "on" });
         }
     }
 }
