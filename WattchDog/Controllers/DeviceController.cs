@@ -14,6 +14,8 @@ namespace WattchDog.Controllers
         // GET: Device
         public ActionResult Index()
         {
+            ViewBag.Title = "WattchDog - Devices";
+
             var repo = new TempRepo();
             var devices = repo.GetAllDevices().Result.Select(x => (DeviceViewModel)x);
 
