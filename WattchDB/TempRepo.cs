@@ -21,20 +21,7 @@ namespace WattchDB
             _connection.Open();
         }
 
-        public async Task<int> InsertDevice(Device device)
-        {
-            int id;
-
-            using (var cmd = _connection.CreateCommand())
-            {
-                cmd.CommandText = "INSERT INTO Devices (mac_address) VALUES(@mac)";
-                cmd.Parameters.AddWithValue("@mac", device.MacAddress);
-                await cmd.ExecuteNonQueryAsync();
-                id = (int)cmd.LastInsertedId;
-            }
-
-            return id;
-        }
+        #region Device Table Interactions
 
         public async Task<Device> GetDevice(string column, object value)
         {
@@ -63,6 +50,66 @@ namespace WattchDB
 
             return result;
         }
+
+        public async Task<IEnumerable<Device>> GetAllDevices()
+        {
+            List<Device> result = new List<Device>();
+
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = "SELECT * FROM Devices";
+
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (reader != null)
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var device = new Device();
+
+                            device.ID = (int)reader["id"];
+                            device.Name = reader["name"] as string;
+                            device.MacAddress = reader["mac_address"] as string;
+                            device.Created = (DateTime)reader["created"];
+
+                            result.Add(device);
+                        }
+
+                        reader.Close();
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public async Task UpdateDeviceName(string searchCol, string searchVal, string name)
+        {
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = "UPDATE Devices SET name = @name WHERE " + searchCol + " = @searchVal";
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@searchVal", searchVal);
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        public async Task<int> InsertDevice(Device device)
+        {
+            int id;
+
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = "INSERT INTO Devices (mac_address) VALUES(@mac)";
+                cmd.Parameters.AddWithValue("@mac", device.MacAddress);
+                await cmd.ExecuteNonQueryAsync();
+                id = (int)cmd.LastInsertedId;
+            }
+
+            return id;
+        }
+
+        #endregion
 
         public async Task InsertData(string table, int deviceId, double value, DateTime timeRecorded)
         {
