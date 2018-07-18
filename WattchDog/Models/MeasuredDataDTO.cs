@@ -32,12 +32,12 @@ namespace WattchDog.Models
 
         [Required]
         public double EnergyUsage { get; set; }
+
+        public DateTime Timestamp { get; set; }
     }
 
     public class MeasuredDataResponse
     {
         public string DeviceStatus { get; set; }
-        public Device Device { get; set; }
-        public int Result { get; set; }
     }
 }

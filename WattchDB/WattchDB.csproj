@@ -54,10 +54,10 @@
   <ItemGroup>
     <Compile Include="Attributes\SqlColumnAttribute.cs" />
     <Compile Include="Attributes\SqlTableAttribute.cs" />
-    <Compile Include="DatabaseContext.cs" />
     <Compile Include="Models\Device.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\Repository.cs" />
+    <Compile Include="TempRepo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -67,6 +67,8 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
