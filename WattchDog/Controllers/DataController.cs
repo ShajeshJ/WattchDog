@@ -18,6 +18,12 @@ namespace WattchDog.Controllers
         [Route("")]
         public async Task<IHttpActionResult> SendData(MeasuredDataDTO input)
         {
+            var vrms = 1001 * 0.512 * ((input.MaxVoltage - input.MinVoltage) / (5 * 2 * Math.Sqrt(2)));
+            var irms = 0.512 * ((input.MaxCurrent - input.MinCurrent) / (2 * Math.Sqrt(2)));
+
+            var realPower = vrms * irms;
+            var energyUsage = realPower * input.SampleDuration;
+
             var tempRepo = new TempRepo();
 
             var device = await tempRepo.GetDevice("mac_address", input.MacAddress);
@@ -33,15 +39,13 @@ namespace WattchDog.Controllers
                 deviceId = device.ID;
             }
 
-            var time = input.Timestamp == default(DateTime) ? DateTime.Now : input.Timestamp;
-
-            await tempRepo.InsertData("ApparentPowers", deviceId, input.ApparentPower, time);
-            await tempRepo.InsertData("EnergyUsages", deviceId, input.EnergyUsage, time);
-            await tempRepo.InsertData("Frequencies", deviceId, input.Frequency, time);
-            await tempRepo.InsertData("PowerFactors", deviceId, input.PowerFactor, time);
-            await tempRepo.InsertData("RealPowers", deviceId, input.RealPower, time);
-            await tempRepo.InsertData("RmsCurrents", deviceId, input.RmsCurrent, time);
-            await tempRepo.InsertData("RmsVoltages", deviceId, input.RmsVoltage, time);
+            //await tempRepo.InsertData("ApparentPowers", deviceId, input.ApparentPower, input.Timestamp);
+            await tempRepo.InsertData("EnergyUsages", deviceId, energyUsage, input.Timestamp);
+            //await tempRepo.InsertData("Frequencies", deviceId, input.Frequency, input.Timestamp);
+            await tempRepo.InsertData("PowerFactors", deviceId, 0.9, input.Timestamp);
+            await tempRepo.InsertData("RealPowers", deviceId, realPower, input.Timestamp);
+            await tempRepo.InsertData("RmsCurrents", deviceId, irms, input.Timestamp);
+            await tempRepo.InsertData("RmsVoltages", deviceId, vrms, input.Timestamp);
 
             return Ok(new MeasuredDataResponse() { DeviceStatus = "on" });
         }

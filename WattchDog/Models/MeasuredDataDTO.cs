@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -10,30 +11,32 @@ namespace WattchDog.Models
     public class MeasuredDataDTO
     {
         [Required]
+        [JsonProperty("macaddress")]
         public string MacAddress { get; set; }
 
         [Required]
-        public double RmsVoltage { get; set; }
+        [JsonProperty("minvoltage")]
+        public double MinVoltage { get; set; }
 
         [Required]
-        public double RmsCurrent { get; set; }
+        [JsonProperty("maxvoltage")]
+        public double MaxVoltage { get; set; }
 
         [Required]
-        public double RealPower { get; set; }
+        [JsonProperty("mincurrent")]
+        public double MinCurrent { get; set; }
+        
+        [Required]
+        [JsonProperty("maxcurrent")]
+        public double MaxCurrent { get; set; }
 
         [Required]
-        public double ApparentPower { get; set; }
-
-        [Required]
-        public double Frequency { get; set; }
-
-        [Required]
-        public double PowerFactor { get; set; }
-
-        [Required]
-        public double EnergyUsage { get; set; }
-
+        [JsonProperty("timestamp")]
         public DateTime Timestamp { get; set; }
+
+        [Required]
+        [JsonProperty("sampletime")]
+        public double SampleDuration { get; set; }
     }
 
     public class MeasuredDataResponse
