@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WattchDB.Attributes;
 
 namespace WattchDB.Models
 {
-    [DbTable("Devices")]
+    [Table("Devices", Schema = "ebdb")]
     public class Device
     {
-        [DbKey("id")]
+        [Key]
+        [Column("id")]
         public int ID { get; set; }
 
-        [DbCol("name")]
+        [Column("name")]
         public string Name { get; set; }
 
-        [DbCol("mac_address")]
+        [Column("mac_address")]
         public string MacAddress { get; set; }
 
-        [DbCol("created")]
+        [Column("created")]
         public DateTime Created { get; set; }
     }
 }

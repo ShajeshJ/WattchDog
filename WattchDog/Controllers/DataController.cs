@@ -14,18 +14,20 @@ namespace WattchDog.Controllers
     [RoutePrefix("api/data")]
     public class DataController : ApiController
     {
-        private IDeviceRepository _deviceRepo;
-
-        public DataController(IDeviceRepository deviceRepo)
-        {
-            _deviceRepo = deviceRepo;
-        }
-
         [HttpPost]
         [Route("")]
         public async Task<IHttpActionResult> SendData(MeasuredDataDTO input)
         {
-            return Ok(new MeasuredDataResponse() { DeviceStatus = "on" });
+            Device result;
+            int num;
+            using (var context = new DatabaseContext())
+            {
+                result = context.Devices.FirstOrDefault();
+                result.Name = "new name";
+                num = context.SaveChanges();
+            }
+
+            return Ok(new MeasuredDataResponse() { DeviceStatus = "on", Device = result, Result = num });
         }
     }
 }

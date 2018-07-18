@@ -38,5 +38,6 @@ namespace WattchDog.Models
     {
         public string DeviceStatus { get; set; }
         public Device Device { get; set; }
+        public int Result { get; set; }
     }
 }
