@@ -19,7 +19,7 @@ namespace WattchDog.Controllers
         [Route("")]
         public async Task<IHttpActionResult> SendData(MeasuredDataDTO input)
         {
-            double irms;
+            double irms, vrms;
             var powerFactor = 0.9;
 
             if (input.MaxCurrent - input.MinCurrent < 0.5)
@@ -32,7 +32,15 @@ namespace WattchDog.Controllers
                 irms = 0.512 * ((input.MaxCurrent - input.MinCurrent) / (2 * Math.Sqrt(2)));
             }
 
-            var vrms = 1001 * 0.512 * ((input.MaxVoltage - input.MinVoltage) / (5 * 2 * Math.Sqrt(2)));
+            if (input.MaxVoltage - input.MinVoltage < 0.5)
+            {
+                vrms = 0;
+                powerFactor = 0;
+            }
+            else
+            {
+                vrms = 1001 * 0.512 * ((input.MaxVoltage - input.MinVoltage) / (5 * 2 * Math.Sqrt(2)));
+            }
 
             var realPower = vrms * irms;
             var energyUsage = realPower * input.SampleDuration;
