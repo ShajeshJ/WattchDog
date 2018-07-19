@@ -18,12 +18,6 @@ namespace WattchDB
         {
             _connection = new MySqlConnection();
             _connection.ConnectionString = _connectionStr;
-            _connection.Open();
-        }
-
-        ~TempRepo()
-        {
-            _connection.Close();
         }
 
         #region Device Table Interactions
@@ -31,6 +25,8 @@ namespace WattchDB
         public async Task<Device> GetDevice(string column, object value)
         {
             Device result = null;
+
+            await _connection.OpenAsync();
 
             using (var cmd = _connection.CreateCommand())
             {
@@ -54,12 +50,16 @@ namespace WattchDB
                 }
             }
 
+            await _connection.CloseAsync();
+
             return result;
         }
 
         public async Task<IEnumerable<Device>> GetAllDevices()
         {
             List<Device> result = new List<Device>();
+
+            await _connection.OpenAsync();
 
             using (var cmd = _connection.CreateCommand())
             {
@@ -87,11 +87,15 @@ namespace WattchDB
                 }
             }
 
+            await _connection.CloseAsync();
+
             return result;
         }
 
         public async Task UpdateDeviceName(string searchCol, string searchVal, string name)
         {
+            await _connection.OpenAsync();
+
             using (var cmd = _connection.CreateCommand())
             {
                 cmd.CommandText = "UPDATE Devices SET name = @name WHERE " + searchCol + " = @searchVal";
@@ -99,10 +103,14 @@ namespace WattchDB
                 cmd.Parameters.AddWithValue("@searchVal", searchVal);
                 await cmd.ExecuteNonQueryAsync();
             }
+
+            await _connection.CloseAsync();
         }
 
         public async Task UpdateDeviceStatus(string searchCol, string searchVal, bool status)
         {
+            await _connection.OpenAsync();
+
             using (var cmd = _connection.CreateCommand())
             {
                 cmd.CommandText = "UPDATE Devices SET status = @status WHERE " + searchCol + " = @searchVal";
@@ -110,11 +118,15 @@ namespace WattchDB
                 cmd.Parameters.AddWithValue("@searchVal", searchVal);
                 await cmd.ExecuteNonQueryAsync();
             }
+
+            await _connection.CloseAsync();
         }
 
         public async Task<int> InsertDevice(Device device)
         {
             int id;
+
+            await _connection.OpenAsync();
 
             using (var cmd = _connection.CreateCommand())
             {
@@ -123,6 +135,8 @@ namespace WattchDB
                 await cmd.ExecuteNonQueryAsync();
                 id = (int)cmd.LastInsertedId;
             }
+
+            await _connection.CloseAsync();
 
             return id;
         }
@@ -134,6 +148,8 @@ namespace WattchDB
         public async Task<IEnumerable<Data>> GetData(string table, int deviceId, int numRecords)
         {
             var result = new List<Data>();
+
+            await _connection.OpenAsync();
 
             using (var cmd = _connection.CreateCommand())
             {
@@ -163,11 +179,15 @@ namespace WattchDB
                 }
             }
 
+            await _connection.CloseAsync();
+
             return result;
         }
 
         public async Task InsertData(string table, int deviceId, double value, DateTime timeRecorded)
         {
+            await _connection.OpenAsync();
+
             using (var cmd = _connection.CreateCommand())
             {
                 cmd.CommandText = "INSERT INTO " + table + " (value, device_id, date_recorded) VALUES(@value, @devId, @time)";
@@ -177,6 +197,8 @@ namespace WattchDB
 
                 await cmd.ExecuteNonQueryAsync();
             }
+
+            await _connection.CloseAsync();
         }
 
         #endregion
