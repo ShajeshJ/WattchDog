@@ -56,6 +56,7 @@
     <Compile Include="Attributes\SqlTableAttribute.cs" />
     <Compile Include="Models\Data.cs" />
     <Compile Include="Models\Device.cs" />
+    <Compile Include="Models\TotalEnergy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="TempRepo.cs" />

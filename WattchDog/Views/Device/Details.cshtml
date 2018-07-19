@@ -30,19 +30,19 @@
                             @switch (Model.Type)
                             {
                                 case DataType.EnergyUsage:
-                                    <td>Energy Usage</td>
+                                    <td>Energy Usage (KWh)</td>
                                     break;
                                 case DataType.Irms:
-                                    <td>Rms Current</td>
+                                    <td>Rms Current (Arms)</td>
                                     break;
                                 case DataType.PowerFactor:
                                     <td>Power Factor</td>
                                     break;
                                 case DataType.RealPower:
-                                    <td>Real Power</td>
+                                    <td>Real Power (W)</td>
                                     break;
                                 default:
-                                    <td>Rms Voltage</td>
+                                    <td>Rms Voltage (Vrms)</td>
                                     break;
                             }
                             <td>Date Recorded</td>
@@ -52,13 +52,26 @@
                         @foreach (var datapoint in Model.Data)
                         {
                             <tr>
-                                <td>@datapoint.Value</td>
+                                @if (Model.Type == DataType.EnergyUsage)
+                                {
+                                    <td>@datapoint.Value.ToString("0.#######")</td>
+                                }
+                                else
+                                {
+                                    <td>@datapoint.Value.ToString("0.##")</td>
+                                }
                                 <td>@datapoint.Time.ToString("hh:mm:ss tt dd/MMM/yyyy")</td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
+            @if (Model.Type == DataType.EnergyUsage)
+            {
+                <div>
+                    <h4>Total Energy Usage (KWh): <span id="totalenergy">@Model.Energy.Value.ToString("0.#####")</span></h4>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -76,7 +89,7 @@
             // Reference the auto-generated proxy for the hub.
             var deviceInfo = $.connection.deviceHub;
             // Create a function that the hub can call back to display messages.
-            deviceInfo.client.addMeasurements = function (realpower, energyusage, powerfactor, vrms, irms, date) {
+            deviceInfo.client.addMeasurements = function (realpower, energyusage, powerfactor, vrms, irms, totalenergy, date) {
                 var rowCount = $('#tablecontent tr').length;
 
                 if (rowCount == 10) {
@@ -87,6 +100,7 @@
                 {
                     case DataType.EnergyUsage:
                         @:$('#tablecontent').prepend('<tr><td>' + energyusage + '</td><td>' + date + '</td></tr>');
+                        @:$('#totalenergy').text(totalenergy);
                         break;
                     case DataType.Irms:
                         @:$('#tablecontent').prepend('<tr><td>' + irms + '</td><td>' + date + '</td></tr>');

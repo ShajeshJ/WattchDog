@@ -43,7 +43,7 @@ namespace WattchDog.Controllers
             }
 
             var realPower = vrms * irms;
-            var energyUsage = realPower * input.SampleDuration;
+            var energyUsage = (realPower * input.SampleDuration) / (1000 * 3600);
 
             var tempRepo = new TempRepo();
 
@@ -52,17 +52,23 @@ namespace WattchDog.Controllers
             int deviceId;
             var status = "on";
 
+            double totalEnergy;
+
             if (device == null)
             {
+                totalEnergy = energyUsage;
                 deviceId = await tempRepo.InsertDevice(new Device() { MacAddress = input.MacAddress });
             }
             else
             {
                 deviceId = device.ID;
                 status = device.Status ? "on" : "off";
+
+                var totalEnergyObj = await tempRepo.GetTotalEnergy(deviceId);
+                totalEnergy = totalEnergyObj.Value + energyUsage;
             }
 
-            DeviceHub.SendData(input.MacAddress, realPower, energyUsage, powerFactor, vrms, irms, input.Timestamp);
+            DeviceHub.SendData(input.MacAddress, realPower, energyUsage, powerFactor, vrms, irms, totalEnergy, input.Timestamp);
 
             //await tempRepo.InsertData("ApparentPowers", deviceId, input.ApparentPower, input.Timestamp);
             await tempRepo.InsertData("EnergyUsages", deviceId, energyUsage, input.Timestamp);
@@ -71,6 +77,15 @@ namespace WattchDog.Controllers
             await tempRepo.InsertData("RealPowers", deviceId, realPower, input.Timestamp);
             await tempRepo.InsertData("RmsCurrents", deviceId, irms, input.Timestamp);
             await tempRepo.InsertData("RmsVoltages", deviceId, vrms, input.Timestamp);
+
+            if (device == null)
+            {
+                await tempRepo.InsertTotalEnergy(deviceId, totalEnergy);
+            }
+            else
+            {
+                await tempRepo.UpdateTotalEnergy(deviceId, totalEnergy);
+            }
 
             return Ok(new MeasuredDataResponse() { DeviceStatus = status });
         }
