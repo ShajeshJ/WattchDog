@@ -210,7 +210,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\DeviceHub.cs" />
-    <Compile Include="Models\DataViewModel.cs" />
+    <Compile Include="Models\DeviceDataViewModel.cs" />
     <Compile Include="Models\DeviceViewModel.cs" />
     <Compile Include="Models\MeasuredDataDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

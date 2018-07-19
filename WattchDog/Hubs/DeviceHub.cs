@@ -13,10 +13,10 @@ namespace WattchDog.Hubs
             Groups.Add(Context.ConnectionId, macAddress);
         }
 
-        public static void SendData(string macAddress, double realPower, DateTime date)
+        public static void SendData(string macAddress, double realPower, double energyUsage, double powerFactor, double vrms, double irms, DateTime date)
         {
             var context = GlobalHost.ConnectionManager.GetHubContext<DeviceHub>();
-            context.Clients.Group(macAddress).addMeasurements(realPower, date.ToString("hh:mm:ss tt dd/MMM/yyyy"));
+            context.Clients.Group(macAddress).addMeasurements(realPower, energyUsage, powerFactor, vrms, irms, date.ToString("hh:mm:ss tt dd/MMM/yyyy"));
         }
     }
 }

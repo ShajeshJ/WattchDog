@@ -37,17 +37,42 @@ namespace WattchDog.Controllers
             return RedirectToAction("Index");
         }
 
-        public ActionResult Details(string macaddress)
+        public ActionResult Details(string macaddress, Models.DataType type = Models.DataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Device Data";
 
+            string table = "";
+            switch(type)
+            {
+                case Models.DataType.EnergyUsage:
+                    table = "EnergyUsages";
+                    break;
+                case Models.DataType.Irms:
+                    table = "RmsCurrents";
+                    break;
+                case Models.DataType.PowerFactor:
+                    table = "PowerFactors";
+                    break;
+                case Models.DataType.RealPower:
+                    table = "RealPowers";
+                    break;
+                default:
+                    table = "RmsVoltages";
+                    break;
+            }
+
             var repo = new TempRepo();
 
-            var deviceId = repo.GetDevice("mac_address", macaddress).Result.ID;
+            var deviceData = new DeviceDataViewModel();
 
-            var data = repo.GetData("RealPowers", deviceId, 10).Result.Select(d => (DataViewModel)d);
+            var device = repo.GetDevice("mac_address", macaddress).Result;
+            deviceData.Device = (DeviceViewModel)device;
 
-            return View(data);
+            var data = repo.GetData(table, device.ID, 10).Result.Select(d => (DataViewModel)d);
+            deviceData.Type = type;
+            deviceData.Data = data;
+
+            return View(deviceData);
         }
     }
 }

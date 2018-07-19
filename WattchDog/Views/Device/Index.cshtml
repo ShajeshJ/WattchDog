@@ -26,7 +26,7 @@
                     @foreach (var device in Model)
                     {
                         <tr>
-                            <td>@Html.ActionLink(device.Name ?? "Unnamed", "Details", new { macaddress = device.MacAddress }, null)</td>
+                            <td>@Html.ActionLink(device.Name ?? "{ Unnamed }", "Details", new { macaddress = device.MacAddress }, null)</td>
                             <td>@device.MacAddress</td>
                             <td>
                                 @using (Html.BeginForm("EditName", "Device", FormMethod.Post))

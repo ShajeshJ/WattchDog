@@ -21,6 +21,11 @@ namespace WattchDB
             _connection.Open();
         }
 
+        ~TempRepo()
+        {
+            _connection.Close();
+        }
+
         #region Device Table Interactions
 
         public async Task<Device> GetDevice(string column, object value)

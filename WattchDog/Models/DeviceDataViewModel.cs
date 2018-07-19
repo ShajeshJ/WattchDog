@@ -6,6 +6,15 @@ using WattchDB.Models;
 
 namespace WattchDog.Models
 {
+    public class DeviceDataViewModel
+    {
+        public DeviceViewModel Device { get; set; }
+
+        public DataType Type { get; set; }
+
+        public IEnumerable<DataViewModel> Data { get; set; }
+    }
+
     public class DataViewModel
     {
         public double Value { get; set; }
@@ -16,5 +25,14 @@ namespace WattchDog.Models
         {
             return new DataViewModel { Value = obj.Value, Time = obj.TimeRecorded };
         }
+    }
+
+    public enum DataType
+    {
+        RealPower = 1, 
+        EnergyUsage = 2, 
+        PowerFactor = 3, 
+        Vrms = 4, 
+        Irms = 5
     }
 }
