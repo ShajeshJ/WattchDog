@@ -111,6 +111,43 @@ namespace WattchDB
 
         #endregion
 
+        #region Data Table Interactions
+
+        public async Task<IEnumerable<Data>> GetData(string table, int deviceId, int numRecords)
+        {
+            var result = new List<Data>();
+
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = "SELECT * FROM " + table + " WHERE device_id=@devId ORDER BY date_recorded DESC LIMIT @limit";
+                cmd.Parameters.AddWithValue("@devId", deviceId);
+                cmd.Parameters.AddWithValue("@limit", numRecords);
+
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (reader != null)
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var datapoint = new Data();
+
+                            datapoint.ID = (int)reader["id"];
+                            datapoint.Value = (double)reader["value"];
+                            datapoint.DeviceId = (int)reader["device_id"];
+                            datapoint.TimeRecorded = (DateTime)reader["date_recorded"];
+                            datapoint.Type = table;
+
+                            result.Add(datapoint);
+                        }
+
+                        reader.Close();
+                    }
+                }
+            }
+
+            return result;
+        }
+
         public async Task InsertData(string table, int deviceId, double value, DateTime timeRecorded)
         {
             using (var cmd = _connection.CreateCommand())
@@ -123,5 +160,7 @@ namespace WattchDB
                 await cmd.ExecuteNonQueryAsync();
             }
         }
+
+        #endregion
     }
 }

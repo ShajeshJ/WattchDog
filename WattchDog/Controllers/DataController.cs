@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using WattchDB;
 using WattchDB.Models;
+using WattchDog.Hubs;
 using WattchDog.Models;
 
 namespace WattchDog.Controllers
@@ -38,6 +39,8 @@ namespace WattchDog.Controllers
             {
                 deviceId = device.ID;
             }
+
+            DeviceHub.SendData(input.MacAddress, realPower, input.Timestamp);
 
             //await tempRepo.InsertData("ApparentPowers", deviceId, input.ApparentPower, input.Timestamp);
             await tempRepo.InsertData("EnergyUsages", deviceId, energyUsage, input.Timestamp);

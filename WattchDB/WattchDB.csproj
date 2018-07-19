@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Attributes\SqlColumnAttribute.cs" />
     <Compile Include="Attributes\SqlTableAttribute.cs" />
+    <Compile Include="Models\Data.cs" />
     <Compile Include="Models\Device.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\Repository.cs" />

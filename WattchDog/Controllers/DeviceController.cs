@@ -17,7 +17,7 @@ namespace WattchDog.Controllers
             ViewBag.Title = "WattchDog - Devices";
 
             var repo = new TempRepo();
-            var devices = repo.GetAllDevices().Result.Select(x => (DeviceViewModel)x);
+            var devices = repo.GetAllDevices().Result.Select(d => (DeviceViewModel)d);
 
             return View(devices);
         }
@@ -37,26 +37,17 @@ namespace WattchDog.Controllers
             return RedirectToAction("Index");
         }
 
-        //// GET: Device/Details/5
-        //public ActionResult Details(string macaddress)
-        //{
-        //    return View();
-        //}
+        public ActionResult Details(string macaddress)
+        {
+            ViewBag.Title = "WattchDog - Device Data";
 
-        //// POST: Device/Edit/5
-        //[HttpPost]
-        //public ActionResult Edit(int id, FormCollection collection)
-        //{
-        //    try
-        //    {
-        //        // TODO: Add update logic here
+            var repo = new TempRepo();
 
-        //        return RedirectToAction("Index");
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
+            var deviceId = repo.GetDevice("mac_address", macaddress).Result.ID;
+
+            var data = repo.GetData("RealPowers", deviceId, 10).Result.Select(d => (DataViewModel)d);
+
+            return View(data);
+        }
     }
 }
