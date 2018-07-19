@@ -12,9 +12,11 @@ namespace WattchDog.Models
         
         public string MacAddress { get; set; }
 
+        public bool Status { get; set; }
+
         public static explicit operator DeviceViewModel(Device obj)
         {
-            return new DeviceViewModel { MacAddress = obj.MacAddress, Name = obj.Name };
+            return new DeviceViewModel { MacAddress = obj.MacAddress, Name = obj.Name, Status = obj.Status };
         }
     }
 }

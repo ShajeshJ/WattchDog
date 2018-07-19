@@ -26,14 +26,36 @@
                     @foreach (var device in Model)
                     {
                         <tr>
-                            <td>@Html.ActionLink(device.Name ?? "{ Unnamed }", "Details", new { macaddress = device.MacAddress }, null)</td>
+                            <td>
+                                @if (device.Status)
+                                {
+                                    <span class="glyphicon glyphicon-ok-circle" style="color:#5cb85c"></span>
+                                }
+                                else
+                                {
+                                    <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
+                                }
+                                @Html.ActionLink(device.Name ?? "{ Unnamed }", "Details", new { macaddress = device.MacAddress }, null)
+                            </td>
                             <td>@device.MacAddress</td>
                             <td>
                                 @using (Html.BeginForm("EditName", "Device", FormMethod.Post))
                                 {
                                     @Html.Hidden("macaddress", device.MacAddress)
-                                    <span>@Html.TextBox("name")</span>
+                                    <span>@Html.TextBox("name", null, new { @placeholder = device.Name ?? "{ Unnamed }" })</span>
                                     <span><input class="btn btn-default" type="submit" value="Rename"></span>
+                                }
+                            </td>
+                            <td>
+                                @if (device.Status)
+                                {
+                                    <a class="btn btn-success" style="width:75px" disabled>ON</a>
+                                    @Html.ActionLink("OFF", "EditStatus", "Device", new { macaddress = device.MacAddress, status = false }, new { @class = "btn btn-danger", @style = "width:75px" });
+                               }
+                                else
+                                {
+                                        @Html.ActionLink("ON", "EditStatus", "Device", new { macaddress = device.MacAddress, status = true }, new { @class = "btn btn-success", @style = "width:75px" });
+                                    <a class="btn btn-danger" style="width:75px" disabled>OFF</a>
                                 }
                             </td>
                         </tr>

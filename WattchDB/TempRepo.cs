@@ -47,6 +47,7 @@ namespace WattchDB
                         result.Name = reader["name"] as string;
                         result.MacAddress = reader["mac_address"] as string;
                         result.Created = (DateTime)reader["created"];
+                        result.Status = (bool)reader["status"];
 
                         reader.Close();
                     }
@@ -76,6 +77,7 @@ namespace WattchDB
                             device.Name = reader["name"] as string;
                             device.MacAddress = reader["mac_address"] as string;
                             device.Created = (DateTime)reader["created"];
+                            device.Status = (bool)reader["status"];
 
                             result.Add(device);
                         }
@@ -94,6 +96,17 @@ namespace WattchDB
             {
                 cmd.CommandText = "UPDATE Devices SET name = @name WHERE " + searchCol + " = @searchVal";
                 cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@searchVal", searchVal);
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        public async Task UpdateDeviceStatus(string searchCol, string searchVal, bool status)
+        {
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = "UPDATE Devices SET status = @status WHERE " + searchCol + " = @searchVal";
+                cmd.Parameters.AddWithValue("@status", status);
                 cmd.Parameters.AddWithValue("@searchVal", searchVal);
                 await cmd.ExecuteNonQueryAsync();
             }

@@ -1,7 +1,17 @@
 ﻿@using WattchDog.Models;
 @model  WattchDog.Models.DeviceDataViewModel
 
-<h2>@(Model.Device.Name ?? "{ Unnamed }") - Measured Data</h2>
+<h2>
+    @if (Model.Device.Status)
+    {
+        <span class="glyphicon glyphicon-ok-circle" style="color:#5cb85c"></span>
+    }
+    else
+    {
+        <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
+    }
+    @(Model.Device.Name ?? "{ Unnamed }") - Measured Data
+</h2>
 
 <div class="container">
     <div class="row">

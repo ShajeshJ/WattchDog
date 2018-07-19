@@ -37,6 +37,7 @@ namespace WattchDog.Controllers
             var device = await tempRepo.GetDevice("mac_address", input.MacAddress);
 
             int deviceId;
+            var status = "on";
 
             if (device == null)
             {
@@ -45,6 +46,7 @@ namespace WattchDog.Controllers
             else
             {
                 deviceId = device.ID;
+                status = device.Status ? "on" : "off";
             }
 
             DeviceHub.SendData(input.MacAddress, realPower, energyUsage, powerFactor, vrms, irms, input.Timestamp);
@@ -57,7 +59,7 @@ namespace WattchDog.Controllers
             await tempRepo.InsertData("RmsCurrents", deviceId, irms, input.Timestamp);
             await tempRepo.InsertData("RmsVoltages", deviceId, vrms, input.Timestamp);
 
-            return Ok(new MeasuredDataResponse() { DeviceStatus = "on" });
+            return Ok(new MeasuredDataResponse() { DeviceStatus = status });
         }
     }
 }

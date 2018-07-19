@@ -37,6 +37,14 @@ namespace WattchDog.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult EditStatus(string macaddress, bool status)
+        {
+            var repo = new TempRepo();
+            repo.UpdateDeviceStatus("mac_address", macaddress, status).Wait();
+
+            return RedirectToAction("Index");
+        }
+
         public ActionResult Details(string macaddress, Models.DataType type = Models.DataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Device Data";

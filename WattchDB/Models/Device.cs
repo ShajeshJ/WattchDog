@@ -21,5 +21,8 @@ namespace WattchDB.Models
 
         [SqlColumn("created")]
         public DateTime Created { get; set; }
+
+        [SqlColumn("status")]
+        public bool Status { get; set; }
     }
 }
