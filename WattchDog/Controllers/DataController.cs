@@ -32,7 +32,7 @@ namespace WattchDog.Controllers
                 irms = 0.512 * ((input.MaxCurrent - input.MinCurrent) / (2 * Math.Sqrt(2)));
             }
 
-            var vrms = 1001 * 0.512 * ((input.MaxVoltage - input.MinVoltage) / (3.3 * 2 * Math.Sqrt(2)));
+            var vrms = 1001 * 0.512 * ((input.MaxVoltage - input.MinVoltage) / (5 * 2 * Math.Sqrt(2)));
 
             if (vrms < 90)
             {
