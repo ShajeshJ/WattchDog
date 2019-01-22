@@ -14,7 +14,7 @@ phases:
       - nuget restore
   build:
     commands:
-      - msbuild /P:Configuration=Release /T:Build,Package
+      - "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" /P:Configuration=Release /T:Build,Package
 artifacts:
   files:
     - .\WattchDog\bin\*
