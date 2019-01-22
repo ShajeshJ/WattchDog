@@ -19,6 +19,7 @@ namespace WattchDog.Controllers
         [Route("")]
         public async Task<IHttpActionResult> SendData(MeasuredDataDTO input)
         {
+            //testing migration to github
             double irms;
             var powerFactor = 0.9;
 
