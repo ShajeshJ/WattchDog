@@ -50,7 +50,8 @@ namespace WattchDog.Areas.HelpPage.Controllers
             if (!String.IsNullOrEmpty(modelName))
             {
                 ModelDescriptionGenerator modelDescriptionGenerator = Configuration.GetModelDescriptionGenerator();
-                if (modelDescriptionGenerator.GeneratedModels.TryGetValue(modelName, out ModelDescription modelDescription))
+                ModelDescription modelDescription;
+                if (modelDescriptionGenerator.GeneratedModels.TryGetValue(modelName, out modelDescription))
                 {
                     return View(modelDescription);
                 }
