@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using WattchDB.Models;
+using WattchDog.Models.Enums;
 
 namespace WattchDog.Models
 {
@@ -10,7 +11,7 @@ namespace WattchDog.Models
     {
         public DeviceViewModel Device { get; set; }
 
-        public DataType Type { get; set; }
+        public DeviceDataType Type { get; set; }
 
         public IEnumerable<DataViewModel> Data { get; set; }
 
@@ -37,14 +38,5 @@ namespace WattchDog.Models
         {
             return new DataViewModel { Value = obj.Value, Time = obj.TimeRecorded };
         }
-    }
-
-    public enum DataType
-    {
-        RealPower = 1, 
-        EnergyUsage = 2, 
-        PowerFactor = 3, 
-        Vrms = 4, 
-        Irms = 5
     }
 }

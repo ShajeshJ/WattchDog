@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using WattchDB;
 using WattchDog.Models;
+using WattchDog.Models.Enums;
 
 namespace WattchDog.Controllers
 {
@@ -45,23 +46,23 @@ namespace WattchDog.Controllers
             return RedirectToAction("Index");
         }
 
-        public ActionResult Realtime(string macaddress, Models.DataType type = Models.DataType.RealPower)
+        public ActionResult Realtime(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Device Data";
 
             string table = "";
             switch(type)
             {
-                case Models.DataType.EnergyUsage:
+                case DeviceDataType.EnergyUsage:
                     table = "EnergyUsages";
                     break;
-                case Models.DataType.Irms:
+                case DeviceDataType.Irms:
                     table = "RmsCurrents";
                     break;
-                case Models.DataType.PowerFactor:
+                case DeviceDataType.PowerFactor:
                     table = "PowerFactors";
                     break;
-                case Models.DataType.RealPower:
+                case DeviceDataType.RealPower:
                     table = "RealPowers";
                     break;
                 default:
@@ -76,7 +77,7 @@ namespace WattchDog.Controllers
             var device = repo.GetDevice("mac_address", macaddress).Result;
             deviceData.Device = (DeviceViewModel)device;
 
-            if (type == Models.DataType.EnergyUsage)
+            if (type == DeviceDataType.EnergyUsage)
             {
                 deviceData.Energy = (TotalEnergyViewModel)repo.GetTotalEnergy(device.ID).Result;
             }

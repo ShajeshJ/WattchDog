@@ -216,6 +216,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\DeviceHub.cs" />
+    <Compile Include="Models\Enums\DeviceDataType.cs" />
+    <Compile Include="Models\HourlyDataViewModel.cs" />
     <Compile Include="Models\RealtimeDataViewModel.cs" />
     <Compile Include="Models\DeviceViewModel.cs" />
     <Compile Include="Models\MeasuredDataDTO.cs" />

@@ -1,4 +1,4 @@
-﻿@using WattchDog.Models;
+﻿@using WattchDog.Models.Enums;
 @model  WattchDog.Models.RealtimeDataViewModel
 
 <h2>
@@ -16,15 +16,15 @@
 <div class="container">
     <div class="row">
         <div class="col-md-2">
-            @Html.ActionLink("Real Power", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Energy Usage", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.EnergyUsage }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Power Factor", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.PowerFactor }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Rms Voltage", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.Vrms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Rms Current", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.Irms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Real Power", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Energy Usage", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.EnergyUsage }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Power Factor", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.PowerFactor }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Voltage", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Vrms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Current", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Irms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
         </div>
         <div class="col-md-10">
             <div id="chart"></div>
-            @if (Model.Type == DataType.EnergyUsage)
+            @if (Model.Type == DeviceDataType.EnergyUsage)
             {
                 <div>
                     <h4>Total Energy Usage (KWh): <span id="totalenergy">@Model.Energy.Value.ToString("0.#####")</span></h4>
@@ -59,16 +59,16 @@
                     chartOptions.title = {
                         text: @switch (Model.Type)
                         {
-                    case DataType.EnergyUsage:
+                    case DeviceDataType.EnergyUsage:
                         @:'Energy Usage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
-                    case DataType.Irms:
+                    case DeviceDataType.Irms:
                         @:'Rms Current of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
-                    case DataType.PowerFactor:
+                    case DeviceDataType.PowerFactor:
                         @:'Power Factor of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
-                    case DataType.RealPower:
+                    case DeviceDataType.RealPower:
                         @:'Real Power of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                     default:
@@ -93,16 +93,16 @@
                 title: {
                     text: @switch (Model.Type)
                     {
-                        case DataType.EnergyUsage:
+                        case DeviceDataType.EnergyUsage:
                             @:'Energy Usage (KWh)'
                             break;
-                        case DataType.Irms:
+                        case DeviceDataType.Irms:
                             @:'Rms Current (Arms)'
                             break;
-                        case DataType.PowerFactor:
+                        case DeviceDataType.PowerFactor:
                             @:'Power Factor'
                             break;
-                        case DataType.RealPower:
+                        case DeviceDataType.RealPower:
                             @:'Real Power (W)'
                             break;
                         default:
@@ -116,7 +116,7 @@
             //Data hover tooltip Options
             chartOptions.tooltip = {
                 headerFormat: '',
-                pointFormat: @if (Model.Type == DataType.EnergyUsage)
+                pointFormat: @if (Model.Type == DeviceDataType.EnergyUsage)
                 {
                     @:'<b>Time:</b> {point.x:%I:%M:%S %p}<br/><b>Value:</b> {point.y:.7f}'
                 }
@@ -171,17 +171,17 @@
                 //Adding point and removing old one off graph based on which page view we are looking at
                 @switch (Model.Type)
                 {
-                    case DataType.EnergyUsage:
+                    case DeviceDataType.EnergyUsage:
                         @:chartObj.series[0].addPoint([date, energyusage], true, shift);
                         @:$('#totalenergy').text(totalenergy);
                         break;
-                    case DataType.Irms:
+                    case DeviceDataType.Irms:
                         @:chartObj.series[0].addPoint([date, irms], true, shift);
                         break;
-                    case DataType.PowerFactor:
+                    case DeviceDataType.PowerFactor:
                         @:chartObj.series[0].addPoint([date, powerfactor], true, shift);
                         break;
-                    case DataType.RealPower:
+                    case DeviceDataType.RealPower:
                         @:chartObj.series[0].addPoint([date, realpower], true, shift);
                         break;
                     default:
