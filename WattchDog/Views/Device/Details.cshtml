@@ -15,15 +15,15 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-3">
-            <div class="row">@Html.ActionLink("Real Power", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.RealPower }, new { @class = "btn btn-default" })</div>
-            <div class="row">@Html.ActionLink("Energy Usage", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.EnergyUsage }, new { @class = "btn btn-default" })</div>
-            <div class="row">@Html.ActionLink("Power Factor", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.PowerFactor }, new { @class = "btn btn-default" })</div>
-            <div class="row">@Html.ActionLink("Rms Voltage", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.Vrms }, new { @class = "btn btn-default" })</div>
-            <div class="row">@Html.ActionLink("Rms Current", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.Irms }, new { @class = "btn btn-default" })</div>
+        <div class="col-md-2">
+            @Html.ActionLink("Real Power", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Energy Usage", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.EnergyUsage }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Power Factor", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.PowerFactor }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Voltage", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.Vrms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Current", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.Irms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
         </div>
-        <div class="col-md-9">
-            <div class="col-md-12" id="chart" />
+        <div class="col-md-10">
+            <div id="chart"></div>
             @if (Model.Type == DataType.EnergyUsage)
             {
                 <div>
@@ -45,20 +45,20 @@
 
     <script>
         $(function () {
-            // Reference the auto-generated proxy for the hub.
-            var deviceInfo = $.connection.deviceHub;
+                    // Reference the auto-generated proxy for the hub.
+                    var deviceInfo = $.connection.deviceHub;
 
-            //Prepare the highcharts container
-            var chartOptions = {};
+                    //Prepare the highcharts container
+                    var chartOptions = {};
 
-            chartOptions.chart = {
-                type: 'spline'
-            };
+                    chartOptions.chart = {
+                        type: 'spline'
+                    };
 
-            //Title Options
-            chartOptions.title = {
-                text: @switch (Model.Type)
-                {
+                    //Title Options
+                    chartOptions.title = {
+                        text: @switch (Model.Type)
+                        {
                     case DataType.EnergyUsage:
                         @:'Energy Usage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
@@ -137,6 +137,10 @@
             //Legend Options
             chartOptions.legend = {
                 enabled: false
+            }
+
+            chartOptions.time = {
+                useUTC: false
             }
 
             //Initializing retrieved dataset for chart
