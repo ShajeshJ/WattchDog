@@ -1,5 +1,5 @@
 ﻿@using WattchDog.Models;
-@model  WattchDog.Models.DeviceDataViewModel
+@model  WattchDog.Models.RealtimeDataViewModel
 
 <h2>
     @if (Model.Device.Status)
@@ -16,11 +16,11 @@
 <div class="container">
     <div class="row">
         <div class="col-md-2">
-            @Html.ActionLink("Real Power", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Energy Usage", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.EnergyUsage }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Power Factor", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.PowerFactor }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Rms Voltage", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.Vrms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Rms Current", "Details", new { macaddress = Model.Device.MacAddress, type = DataType.Irms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Real Power", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Energy Usage", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.EnergyUsage }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Power Factor", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.PowerFactor }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Voltage", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.Vrms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Current", "Realtime", new { macaddress = Model.Device.MacAddress, type = DataType.Irms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
         </div>
         <div class="col-md-10">
             <div id="chart"></div>

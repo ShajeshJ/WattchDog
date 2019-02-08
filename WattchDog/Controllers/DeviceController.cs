@@ -45,7 +45,7 @@ namespace WattchDog.Controllers
             return RedirectToAction("Index");
         }
 
-        public ActionResult Details(string macaddress, Models.DataType type = Models.DataType.RealPower)
+        public ActionResult Realtime(string macaddress, Models.DataType type = Models.DataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Device Data";
 
@@ -71,7 +71,7 @@ namespace WattchDog.Controllers
 
             var repo = new TempRepo();
 
-            var deviceData = new DeviceDataViewModel();
+            var deviceData = new RealtimeDataViewModel();
 
             var device = repo.GetDevice("mac_address", macaddress).Result;
             deviceData.Device = (DeviceViewModel)device;

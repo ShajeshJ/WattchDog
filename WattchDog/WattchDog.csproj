@@ -216,7 +216,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\DeviceHub.cs" />
-    <Compile Include="Models\DeviceDataViewModel.cs" />
+    <Compile Include="Models\RealtimeDataViewModel.cs" />
     <Compile Include="Models\DeviceViewModel.cs" />
     <Compile Include="Models\MeasuredDataDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -279,7 +279,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Device\Index.cshtml" />
-    <Content Include="Views\Device\Details.cshtml" />
+    <Content Include="Views\Device\Realtime.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

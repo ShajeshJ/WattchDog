@@ -6,7 +6,7 @@ using WattchDB.Models;
 
 namespace WattchDog.Models
 {
-    public class DeviceDataViewModel
+    public class RealtimeDataViewModel
     {
         public DeviceViewModel Device { get; set; }
 
