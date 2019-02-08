@@ -82,6 +82,7 @@ namespace WattchDog.Controllers
             }
 
             var data = repo.GetData(table, device.ID, 10).Result.Select(d => (DataViewModel)d);
+            data = data.Reverse();
             deviceData.Type = type;
             deviceData.Data = data;
 
