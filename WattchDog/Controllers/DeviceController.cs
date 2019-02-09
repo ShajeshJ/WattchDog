@@ -126,6 +126,7 @@ namespace WattchDog.Controllers
             var data = repo.GetAggregatedData(table, device.ID, curTime, DateGrouping.Hourly).Result.Reverse().ToList();
 
             var outputData = new List<HourlyDatapointViewModel>();
+            curTime = new DateTime(curTime.Year, curTime.Month, curTime.Day, curTime.Hour, 0, 0);
             var refTime = new DateTime(curTime.Year, curTime.Month, curTime.Day, curTime.Hour, 0, 0).AddDays(-1);
 
             while (refTime < curTime)
@@ -134,7 +135,7 @@ namespace WattchDog.Controllers
                 {
                     outputData.Add(new HourlyDatapointViewModel()
                     {
-                        HourRecorded = data[0].GroupedDate,
+                        Hour = data[0].GroupedDate,
                         NumSamples = data[0].NumSamples,
                         Value = data[0].AvgValue
                     });
@@ -144,7 +145,7 @@ namespace WattchDog.Controllers
                 {
                     outputData.Add(new HourlyDatapointViewModel()
                     {
-                        HourRecorded = refTime,
+                        Hour = refTime,
                         NumSamples = 0,
                         Value = 0
                     });
@@ -152,15 +153,75 @@ namespace WattchDog.Controllers
 
                 refTime = refTime.AddHours(1);
             }
-            //foreach (var datapoint in data)
-            //{
-            //    outputData.Add(new HourlyDatapointViewModel()
-            //    {
-            //        HourRecorded = datapoint.GroupedDate,
-            //        NumSamples = datapoint.NumSamples,
-            //        Value = datapoint.AvgValue
-            //    });
-            //}
+
+            aggregatetdData.Data = outputData;
+            aggregatetdData.Type = type;
+
+            return View(aggregatetdData);
+        }
+
+        public ActionResult Daily(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
+        {
+            ViewBag.Title = "WattchDog - Daily Device Data";
+
+            string table = "";
+            switch (type)
+            {
+                case DeviceDataType.EnergyUsage:
+                    table = "EnergyUsages";
+                    break;
+                case DeviceDataType.Irms:
+                    table = "RmsCurrents";
+                    break;
+                case DeviceDataType.PowerFactor:
+                    table = "PowerFactors";
+                    break;
+                case DeviceDataType.RealPower:
+                    table = "RealPowers";
+                    break;
+                default:
+                    table = "RmsVoltages";
+                    break;
+            }
+
+            var repo = new TempRepo();
+
+            var aggregatetdData = new DailyDataViewModel();
+
+            var device = repo.GetDevice("mac_address", macaddress).Result;
+            aggregatetdData.Device = (DeviceViewModel)device;
+
+            var curTime = DateTime.Now;
+            var data = repo.GetAggregatedData(table, device.ID, curTime, DateGrouping.Daily).Result.Reverse().ToList();
+
+            var outputData = new List<DailyDatapointViewModel>();
+            curTime = new DateTime(curTime.Year, curTime.Month, curTime.Day);
+            var refTime = new DateTime(curTime.Year, curTime.Month, curTime.Day).AddMonths(-1);
+
+            while (refTime < curTime)
+            {
+                if (data.ElementAtOrDefault(0)?.GroupedDate == refTime)
+                {
+                    outputData.Add(new DailyDatapointViewModel()
+                    {
+                        Date = data[0].GroupedDate,
+                        NumSamples = data[0].NumSamples,
+                        Value = data[0].AvgValue
+                    });
+                    data.RemoveAt(0);
+                }
+                else
+                {
+                    outputData.Add(new DailyDatapointViewModel()
+                    {
+                        Date = refTime,
+                        NumSamples = 0,
+                        Value = 0
+                    });
+                }
+
+                refTime = refTime.AddDays(1);
+            }
 
             aggregatetdData.Data = outputData;
             aggregatetdData.Type = type;

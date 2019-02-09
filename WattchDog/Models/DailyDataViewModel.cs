@@ -7,19 +7,19 @@ using WattchDog.Models.Enums;
 
 namespace WattchDog.Models
 {
-    public class HourlyDataViewModel
+    public class DailyDataViewModel
     {
         public DeviceViewModel Device { get; set; }
 
         public DeviceDataType Type { get; set; }
 
-        public IEnumerable<HourlyDatapointViewModel> Data { get; set; }
+        public IEnumerable<DailyDatapointViewModel> Data { get; set; }
     }
 
-    public class HourlyDatapointViewModel
+    public class DailyDatapointViewModel
     {
         public double Value { get; set; }
         public long NumSamples { get; set; }
-        public DateTime Hour { get; set; }
+        public DateTime Date { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿@using WattchDog.Models.Enums;
-@model  WattchDog.Models.HourlyDataViewModel
+@model  WattchDog.Models.DailyDataViewModel
 
 <h2>
     @if (Model.Device.Status)
@@ -10,14 +10,14 @@
     {
         <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
     }
-    @(Model.Device.Name ?? "{ Unnamed }") - Hourly Data
+    @(Model.Device.Name ?? "{ Unnamed }") - Daily Data
 </h2>
 
 <div class="container">
     <div class="row">
         <div class="col-md-12" align="center">
-            @Html.ActionLink("Hourly", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;", @disabled = "disabled" })
-            @Html.ActionLink("Daily", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Hourly", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Daily", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;", @disabled = "disabled" })
             @Html.ActionLink("Monthly", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
             @Html.ActionLink("Realtime", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
         </div>
@@ -25,11 +25,11 @@
     <hr/>
     <div class="row">
         <div class="col-md-2" align="center">
-            @Html.ActionLink("Real Power", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Energy Usage", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.EnergyUsage }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Power Factor", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.PowerFactor }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Rms Voltage", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Vrms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Rms Current", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Irms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Real Power", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Energy Usage", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.EnergyUsage }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Power Factor", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.PowerFactor }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Voltage", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Vrms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Current", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Irms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
         </div>
         <div class="col-md-10" align="center">
             <div id="chart"></div>
@@ -56,19 +56,19 @@
                 text: @switch (Model.Type)
                 {
                     case DeviceDataType.EnergyUsage:
-                        @:'Hourly Energy Usage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Daily Energy Usage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                     case DeviceDataType.Irms:
-                        @:'Hourly Rms Current of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Daily Rms Current of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                     case DeviceDataType.PowerFactor:
-                        @:'Hourly Power Factor of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Daily Power Factor of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                     case DeviceDataType.RealPower:
-                        @:'Hourly Real Power of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Daily Real Power of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                     default:
-                        @:'Hourly Rms Voltage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Daily Rms Voltage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                 }
             };
@@ -77,11 +77,12 @@
             chartOptions.xAxis = {
                 type: 'datetime',
                 title: {
-                    text: 'Hour'
+                    text: 'Day'
                 },
                 dateTimeLabelFormats: {
-                    hour: '%I:%M %p',
-                    day: '%I:%M %p'
+                    hour: '%b %d',
+                    day: '%b %d',
+                    month: '%b %d'
                 }
             };
 
@@ -114,11 +115,11 @@
                 headerFormat: '',
                 pointFormat: @if (Model.Type == DeviceDataType.EnergyUsage)
                 {
-                    @:'<b>Hour:</b> {point.x:%I:%M %p}<br/><b>Value:</b> {point.y:.7f}'
+                    @:'<b>Hour:</b> {point.x:%b %d}<br/><b>Value:</b> {point.y:.7f}'
                 }
                 else
                 {
-                    @:'<b>Time:</b> {point.x:%I:%M %p}<br/><b>Value:</b> {point.y:.2f}'
+                    @:'<b>Time:</b> {point.x:%b %d}<br/><b>Value:</b> {point.y:.2f}'
                 }
             };
 
@@ -143,7 +144,7 @@
             datapoints = [];
             @foreach (var datapoint in Model.Data)
             {
-                @:datapoints.push([@((datapoint.Hour.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds), @datapoint.Value])
+                @:datapoints.push([@((datapoint.Date.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds), @datapoint.Value])
             }
             console.log(datapoints);
 
