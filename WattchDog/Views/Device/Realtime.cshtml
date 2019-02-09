@@ -15,14 +15,23 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-12" align="center">
+            @Html.ActionLink("Hourly", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Daily", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Monthly", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Realtime", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;", @disabled = "disabled" })
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-2" align="center">
             @Html.ActionLink("Real Power", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
             @Html.ActionLink("Energy Usage", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.EnergyUsage }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
             @Html.ActionLink("Power Factor", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.PowerFactor }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
             @Html.ActionLink("Rms Voltage", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Vrms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
             @Html.ActionLink("Rms Current", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Irms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
         </div>
-        <div class="col-md-10">
+        <div class="col-md-10" align="center">
             <div id="chart"></div>
             @if (Model.Type == DeviceDataType.EnergyUsage)
             {
@@ -109,8 +118,7 @@
                             @:'Rms Voltage (Vrms)'
                             break;
                     }
-                },
-                min: 0
+                }
             };
 
             //Data hover tooltip Options

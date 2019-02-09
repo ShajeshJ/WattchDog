@@ -282,6 +282,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Device\Index.cshtml" />
     <Content Include="Views\Device\Realtime.cshtml" />
+    <Content Include="Views\Device\Hourly.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -14,6 +14,24 @@ namespace WattchDB
         private static string _connectionStr = ConfigurationManager.ConnectionStrings["WattchDB"].ConnectionString;
         MySqlConnection _connection;
 
+        private static string _hourlyQuery = @"SELECT COUNT(*) as numSamples, AVG(value) as average, DATE(date_recorded) as date, HOUR(date_recorded) as hour
+                                                FROM {0} WHERE device_id=@devId
+                                                AND date_recorded >= @mindate AND date_recorded < @maxdate
+                                                GROUP BY date, hour
+                                                ORDER BY date DESC, hour DESC";
+
+        private static string _dailyQuery = @"SELECT COUNT(*) as numSamples, AVG(value) as average, DATE(date_recorded) as date
+                                                FROM {0} WHERE device_id=@devId
+                                                AND date_recorded >= @mindate AND date_recorded < @maxdate
+                                                GROUP BY date
+                                                ORDER BY date DESC";
+
+        private static string _monthlyQuery = @"SELECT COUNT(*) as numSamples, AVG(value) as average, YEAR(date_recorded) as year, MONTH(date_recorded) as month
+                                                FROM {0} WHERE device_id=@devId
+                                                AND date_recorded >= @mindate AND date_recorded < @maxdate
+                                                GROUP BY year, month
+                                                ORDER BY year DESC, month DESC";
+
         public TempRepo()
         {
             _connection = new MySqlConnection();
@@ -170,6 +188,80 @@ namespace WattchDB
                             datapoint.DeviceId = (int)reader["device_id"];
                             datapoint.TimeRecorded = (DateTime)reader["date_recorded"];
                             datapoint.Type = table;
+
+                            result.Add(datapoint);
+                        }
+
+                        reader.Close();
+                    }
+                }
+            }
+
+            await _connection.CloseAsync();
+
+            return result;
+        }
+
+        public async Task<IEnumerable<AggregatedData>> GetAggregatedData(string table, int deviceId, DateTime now, DateGrouping groupType = DateGrouping.Hourly)
+        {
+            var result = new List<AggregatedData>();
+
+            string query, minDate, maxDate;
+
+            switch(groupType)
+            {
+                case DateGrouping.Monthly:
+                    query = string.Format(_monthlyQuery, table);
+                    minDate = (new DateTime(now.Year, now.Month, 1)).AddYears(-1).ToString("yyyy-MM-dd");
+                    maxDate = (new DateTime(now.Year, now.Month, 1)).ToString("yyyy-MM-dd");
+                    break;
+                case DateGrouping.Daily:
+                    query = string.Format(_dailyQuery, table);
+                    minDate = (new DateTime(now.Year, now.Month, now.Day)).AddMonths(-1).ToString("yyyy-MM-dd");
+                    maxDate = (new DateTime(now.Year, now.Month, now.Day)).ToString("yyyy-MM-dd");
+                    break;
+                default:
+                    query = string.Format(_hourlyQuery, table);
+                    minDate = (new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0)).AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                    maxDate = (new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss");
+                    break;
+            }
+
+            await _connection.OpenAsync();
+
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = query;
+                cmd.Parameters.AddWithValue("@devId", deviceId);
+                cmd.Parameters.AddWithValue("@mindate", minDate);
+                cmd.Parameters.AddWithValue("@maxdate", maxDate);
+
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (reader != null)
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var datapoint = new AggregatedData();
+
+                            datapoint.NumSamples = (long)reader["numSamples"];
+                            datapoint.AvgValue = (double)reader["average"];
+                            datapoint.DeviceId = deviceId;
+                            datapoint.GroupedType = groupType;
+                            datapoint.Type = table;
+
+                            switch (groupType)
+                            {
+                                case DateGrouping.Monthly:
+                                    datapoint.GroupedDate = new DateTime((int)reader["year"], (int)reader["month"], 1);
+                                    break;
+                                case DateGrouping.Daily:
+                                    datapoint.GroupedDate = (DateTime)reader["date"];
+                                    break;
+                                default:
+                                    datapoint.GroupedDate = ((DateTime)reader["date"]).AddHours((int)reader["hour"]);
+                                    break;
+                            }
 
                             result.Add(datapoint);
                         }

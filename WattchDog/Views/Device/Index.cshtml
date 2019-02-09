@@ -35,7 +35,7 @@
                                 {
                                     <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
                                 }
-                                @Html.ActionLink(device.Name ?? "{ Unnamed }", "Realtime", new { macaddress = device.MacAddress }, null)
+                                @Html.ActionLink(device.Name ?? "{ Unnamed }", "Hourly", new { macaddress = device.MacAddress }, null)
                             </td>
                             <td>@device.MacAddress</td>
                             <td>
