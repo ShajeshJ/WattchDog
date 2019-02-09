@@ -1,0 +1,161 @@
+﻿@using WattchDog.Models.Enums;
+@model  WattchDog.Models.MonthlyDataViewModel
+
+<h2>
+    @if (Model.Device.Status)
+    {
+        <span class="glyphicon glyphicon-ok-circle" style="color:#5cb85c"></span>
+    }
+    else
+    {
+        <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
+    }
+    @(Model.Device.Name ?? "{ Unnamed }") - Monthly Data
+</h2>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12" align="center">
+            @Html.ActionLink("Hourly", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Daily", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Monthly", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;", @disabled = "disabled" })
+            @Html.ActionLink("Realtime", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+        </div>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-md-2" align="center">
+            @Html.ActionLink("Real Power", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Energy Usage", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.EnergyUsage }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Power Factor", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.PowerFactor }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Voltage", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Vrms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Rms Current", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.Irms }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+        </div>
+        <div class="col-md-10" align="center">
+            <div id="chart"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <!--The jQuery library is required and is referenced by default in _Layout.cshtml. -->
+    <!--Highcharts library. -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+
+    <script>
+        $(function () {
+            //Prepare the highcharts container
+            var chartOptions = {};
+
+            chartOptions.chart = {
+                type: 'spline'
+            };
+
+            //Title Options
+            chartOptions.title = {
+                text: @switch (Model.Type)
+                {
+                    case DeviceDataType.EnergyUsage:
+                        @:'Monthly Energy Usage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        break;
+                    case DeviceDataType.Irms:
+                        @:'Monthly Rms Current of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        break;
+                    case DeviceDataType.PowerFactor:
+                        @:'Monthly Power Factor of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        break;
+                    case DeviceDataType.RealPower:
+                        @:'Monthly Real Power of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        break;
+                    default:
+                        @:'Monthly Rms Voltage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        break;
+                }
+            };
+
+            //X-Axis Options
+            chartOptions.xAxis = {
+                type: 'datetime',
+                title: {
+                    text: 'Month'
+                },
+                dateTimeLabelFormats: {
+                    month: '%b %y',
+                    year: '%b %y'
+                }
+            };
+
+            //Y-Axis Options
+            chartOptions.yAxis = {
+                title: {
+                    text: @switch (Model.Type)
+                    {
+                        case DeviceDataType.EnergyUsage:
+                            @:'Energy Usage (KWh)'
+                            break;
+                        case DeviceDataType.Irms:
+                            @:'Rms Current (Arms)'
+                            break;
+                        case DeviceDataType.PowerFactor:
+                            @:'Power Factor'
+                            break;
+                        case DeviceDataType.RealPower:
+                            @:'Real Power (W)'
+                            break;
+                        default:
+                            @:'Rms Voltage (Vrms)'
+                            break;
+                    }
+                }
+            };
+
+            //Data hover tooltip Options
+            chartOptions.tooltip = {
+                headerFormat: '',
+                pointFormat: @if (Model.Type == DeviceDataType.EnergyUsage)
+                {
+                    @:'<b>Hour:</b> {point.x:%b %y}<br/><b>Value:</b> {point.y:.7f}'
+                }
+                else
+                {
+                    @:'<b>Time:</b> {point.x:%b %y}<br/><b>Value:</b> {point.y:.2f}'
+                }
+            };
+
+            chartOptions.plotOptions = {
+                spline: {
+                    marker: {
+                        enabled: true
+                    }
+                }
+            };
+
+            //Legend Options
+            chartOptions.legend = {
+                enabled: false
+            }
+
+            chartOptions.time = {
+                useUTC: false
+            }
+
+            //Initializing retrieved dataset for chart
+            datapoints = [];
+            @foreach (var datapoint in Model.Data)
+            {
+                @:datapoints.push([@((datapoint.Month.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds), @datapoint.Value])
+            }
+            console.log(datapoints);
+
+            chartOptions.series = [
+                {
+                    name: 'Measurements',
+                    data: datapoints
+                }
+            ]
+
+            //Creating the chart element on the page
+            $('#chart').highcharts(chartOptions);
+        });
+    </script>
+}

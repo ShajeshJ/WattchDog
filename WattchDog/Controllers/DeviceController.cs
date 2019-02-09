@@ -228,5 +228,74 @@ namespace WattchDog.Controllers
 
             return View(aggregatetdData);
         }
+
+        public ActionResult Monthly(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
+        {
+            ViewBag.Title = "WattchDog - Monthly Device Data";
+
+            string table = "";
+            switch (type)
+            {
+                case DeviceDataType.EnergyUsage:
+                    table = "EnergyUsages";
+                    break;
+                case DeviceDataType.Irms:
+                    table = "RmsCurrents";
+                    break;
+                case DeviceDataType.PowerFactor:
+                    table = "PowerFactors";
+                    break;
+                case DeviceDataType.RealPower:
+                    table = "RealPowers";
+                    break;
+                default:
+                    table = "RmsVoltages";
+                    break;
+            }
+
+            var repo = new TempRepo();
+
+            var aggregatetdData = new MonthlyDataViewModel();
+
+            var device = repo.GetDevice("mac_address", macaddress).Result;
+            aggregatetdData.Device = (DeviceViewModel)device;
+
+            var curTime = DateTime.Now;
+            var data = repo.GetAggregatedData(table, device.ID, curTime, DateGrouping.Monthly).Result.Reverse().ToList();
+
+            var outputData = new List<MonthlyDatapointViewModel>();
+            curTime = new DateTime(curTime.Year, curTime.Month, 1);
+            var refTime = new DateTime(curTime.Year, curTime.Month, curTime.Day).AddYears(-1);
+
+            while (refTime < curTime)
+            {
+                if (data.ElementAtOrDefault(0)?.GroupedDate == refTime)
+                {
+                    outputData.Add(new MonthlyDatapointViewModel()
+                    {
+                        Month = data[0].GroupedDate,
+                        NumSamples = data[0].NumSamples,
+                        Value = data[0].AvgValue
+                    });
+                    data.RemoveAt(0);
+                }
+                else
+                {
+                    outputData.Add(new MonthlyDatapointViewModel()
+                    {
+                        Month = refTime,
+                        NumSamples = 0,
+                        Value = 0
+                    });
+                }
+
+                refTime = refTime.AddMonths(1);
+            }
+
+            aggregatetdData.Data = outputData;
+            aggregatetdData.Type = type;
+
+            return View(aggregatetdData);
+        }
     }
 }

@@ -216,6 +216,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\DeviceHub.cs" />
+    <Compile Include="Models\MonthlyDataViewModel.cs" />
     <Compile Include="Models\Enums\DeviceDataType.cs" />
     <Compile Include="Models\DailyDataViewModel.cs" />
     <Compile Include="Models\HourlyDataViewModel.cs" />
@@ -285,6 +286,7 @@
     <Content Include="Views\Device\Realtime.cshtml" />
     <Content Include="Views\Device\Hourly.cshtml" />
     <Content Include="Views\Device\Daily.cshtml" />
+    <Content Include="Views\Device\Monthly.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
