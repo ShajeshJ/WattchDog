@@ -122,7 +122,8 @@ namespace WattchDog.Controllers
             var device = repo.GetDevice("mac_address", macaddress).Result;
             aggregatetdData.Device = (DeviceViewModel)device;
 
-            var curTime = DateTime.Now;
+            var curTime = TimeZoneInfo.ConvertTime(DateTime.Now, 
+                TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
             var data = repo.GetAggregatedData(table, device.ID, curTime, DateGrouping.Hourly).Result.Reverse().ToList();
 
             var outputData = new List<HourlyDatapointViewModel>();
@@ -191,7 +192,8 @@ namespace WattchDog.Controllers
             var device = repo.GetDevice("mac_address", macaddress).Result;
             aggregatetdData.Device = (DeviceViewModel)device;
 
-            var curTime = DateTime.Now;
+            var curTime = TimeZoneInfo.ConvertTime(DateTime.Now,
+                TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
             var data = repo.GetAggregatedData(table, device.ID, curTime, DateGrouping.Daily).Result.Reverse().ToList();
 
             var outputData = new List<DailyDatapointViewModel>();
@@ -260,7 +262,8 @@ namespace WattchDog.Controllers
             var device = repo.GetDevice("mac_address", macaddress).Result;
             aggregatetdData.Device = (DeviceViewModel)device;
 
-            var curTime = DateTime.Now;
+            var curTime = TimeZoneInfo.ConvertTime(DateTime.Now,
+                TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
             var data = repo.GetAggregatedData(table, device.ID, curTime, DateGrouping.Monthly).Result.Reverse().ToList();
 
             var outputData = new List<MonthlyDatapointViewModel>();

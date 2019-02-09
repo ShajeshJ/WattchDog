@@ -143,7 +143,7 @@
             datapoints = [];
             @foreach (var datapoint in Model.Data)
             {
-                @:datapoints.push([@((datapoint.Hour.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds), @datapoint.Value])
+                @:datapoints.push([(new Date("@(datapoint.Hour.ToString("yyyy-MM-ddTHH:mm:ss.fffff"))")).getTime(), @datapoint.Value])
             }
             console.log(datapoints);
 

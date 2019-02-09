@@ -155,7 +155,7 @@
             datapoints = [];
             @foreach (var datapoint in Model.Data)
             {
-                @:datapoints.push([@((datapoint.Time.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds), @datapoint.Value])
+                @:datapoints.push([(new Date("@(datapoint.Time.ToString("yyyy-MM-ddTHH:mm:ss.fffff"))")).getTime(), @datapoint.Value])
             }
 
             chartOptions.series = [
@@ -174,7 +174,7 @@
                 var series = chartObj.series[0];
                 var shift = series.data.length >= 10;
 
-                date = (new Date(date).getTime()); //Converting from string to JS datetime object
+                date = (new Date(date)).getTime(); //Converting from string to JS datetime object
 
                 //Adding point and removing old one off graph based on which page view we are looking at
                 @switch (Model.Type)
