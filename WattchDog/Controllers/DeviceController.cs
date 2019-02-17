@@ -78,11 +78,6 @@ namespace WattchDog.Controllers
             var device = repo.GetDevice("mac_address", macaddress).Result;
             deviceData.Device = (DeviceViewModel)device;
 
-            if (type == DeviceDataType.EnergyUsage)
-            {
-                deviceData.Energy = (TotalEnergyViewModel)repo.GetTotalEnergy(device.ID).Result;
-            }
-
             var data = repo.GetData(table, device.ID, 10).Result.Select(d => (DataViewModel)d);
             data = data.Reverse();
             deviceData.Type = type;

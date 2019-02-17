@@ -33,12 +33,6 @@
         </div>
         <div class="col-md-10" align="center">
             <div id="chart"></div>
-            @if (Model.Type == DeviceDataType.EnergyUsage)
-            {
-                <div>
-                    <h4>Total Energy Usage (KWh): <span id="totalenergy">@Model.Energy.Value.ToString("0.#####")</span></h4>
-                </div>
-            }
         </div>
     </div>
 </div>
@@ -54,20 +48,20 @@
 
     <script>
         $(function () {
-                    // Reference the auto-generated proxy for the hub.
-                    var deviceInfo = $.connection.deviceHub;
+            // Reference the auto-generated proxy for the hub.
+            var deviceInfo = $.connection.deviceHub;
 
-                    //Prepare the highcharts container
-                    var chartOptions = {};
+            //Prepare the highcharts container
+            var chartOptions = {};
 
-                    chartOptions.chart = {
-                        type: 'spline'
-                    };
+            chartOptions.chart = {
+                type: 'spline'
+            };
 
-                    //Title Options
-                    chartOptions.title = {
-                        text: @switch (Model.Type)
-                        {
+            //Title Options
+            chartOptions.title = {
+                text: @switch (Model.Type)
+                {
                     case DeviceDataType.EnergyUsage:
                         @:'Energy Usage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
@@ -169,7 +163,7 @@
             $('#chart').highcharts(chartOptions);
 
             // Callback function called by SignalR central hub (to update data in realtime)
-            deviceInfo.client.addMeasurements = function (realpower, energyusage, powerfactor, vrms, irms, totalenergy, date) {
+            deviceInfo.client.addMeasurements = function (realpower, energyusage, powerfactor, vrms, irms, date) {
                 var chartObj = $('#chart').highcharts(); //Get reference to chart javascript object
                 var series = chartObj.series[0];
                 var shift = series.data.length >= 10;
@@ -181,7 +175,6 @@
                 {
                     case DeviceDataType.EnergyUsage:
                         @:chartObj.series[0].addPoint([date, energyusage], true, shift);
-                        @:$('#totalenergy').text(totalenergy);
                         break;
                     case DeviceDataType.Irms:
                         @:chartObj.series[0].addPoint([date, irms], true, shift);

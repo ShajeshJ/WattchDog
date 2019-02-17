@@ -14,18 +14,6 @@ namespace WattchDog.Models
         public DeviceDataType Type { get; set; }
 
         public IEnumerable<DataViewModel> Data { get; set; }
-
-        public TotalEnergyViewModel Energy { get; set; }
-    }
-
-    public class TotalEnergyViewModel
-    {
-        public double Value { get; set; }
-
-        public static explicit operator TotalEnergyViewModel(TotalEnergy obj)
-        {
-            return new TotalEnergyViewModel { Value = obj.Value };
-        }
     }
 
     public class DataViewModel
