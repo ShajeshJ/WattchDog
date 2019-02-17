@@ -62,6 +62,7 @@ namespace WattchDB
                         result.MacAddress = reader["mac_address"] as string;
                         result.Created = (DateTime)reader["created"];
                         result.Status = (bool)reader["status"];
+                        result.Secret = reader["secret"] as string;
 
                         reader.Close();
                     }
@@ -96,6 +97,7 @@ namespace WattchDB
                             device.MacAddress = reader["mac_address"] as string;
                             device.Created = (DateTime)reader["created"];
                             device.Status = (bool)reader["status"];
+                            device.Secret = reader["secret"] as string;
 
                             result.Add(device);
                         }
@@ -140,24 +142,24 @@ namespace WattchDB
             await _connection.CloseAsync();
         }
 
-        public async Task<int> InsertDevice(Device device)
-        {
-            int id;
+        //public async Task<int> InsertDevice(Device device)
+        //{
+        //    int id;
 
-            await _connection.OpenAsync();
+        //    await _connection.OpenAsync();
 
-            using (var cmd = _connection.CreateCommand())
-            {
-                cmd.CommandText = "INSERT INTO Devices (mac_address) VALUES(@mac)";
-                cmd.Parameters.AddWithValue("@mac", device.MacAddress);
-                await cmd.ExecuteNonQueryAsync();
-                id = (int)cmd.LastInsertedId;
-            }
+        //    using (var cmd = _connection.CreateCommand())
+        //    {
+        //        cmd.CommandText = "INSERT INTO Devices (mac_address) VALUES(@mac)";
+        //        cmd.Parameters.AddWithValue("@mac", device.MacAddress);
+        //        await cmd.ExecuteNonQueryAsync();
+        //        id = (int)cmd.LastInsertedId;
+        //    }
 
-            await _connection.CloseAsync();
+        //    await _connection.CloseAsync();
 
-            return id;
-        }
+        //    return id;
+        //}
 
         #endregion
 

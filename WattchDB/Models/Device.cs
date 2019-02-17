@@ -24,5 +24,8 @@ namespace WattchDB.Models
 
         [SqlColumn("status")]
         public bool Status { get; set; }
+
+        [SqlColumn("secret")]
+        public string Secret { get; set; }
     }
 }

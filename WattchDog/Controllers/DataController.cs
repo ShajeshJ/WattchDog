@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using WattchDB;
 using WattchDB.Models;
+using WattchDog.Constants;
+using WattchDog.Extensions;
 using WattchDog.Hubs;
 using WattchDog.Models;
 
@@ -19,70 +21,41 @@ namespace WattchDog.Controllers
         [Route("")]
         public async Task<IHttpActionResult> SendData(MeasuredDataDTO input)
         {
-            double irms;
-            var powerFactor = 0.9;
-
-            if (input.MaxCurrent - input.MinCurrent < 0.5)
-            {
-                irms = 0;
-                powerFactor = 0;
-            }
-            else
-            {
-                irms = 0.512 * ((input.MaxCurrent - input.MinCurrent) / (2 * Math.Sqrt(2)));
-            }
-
-            var vrms = 1001 * 0.512 * ((input.MaxVoltage - input.MinVoltage) / (5 * 2 * Math.Sqrt(2)));
-
-            if (vrms < 90)
-            {
-                vrms = 0;
-                powerFactor = 0;
-            }
-
-            var realPower = vrms * irms;
-            var energyUsage = (realPower * input.SampleDuration) / (1000 * 3600);
-
             var tempRepo = new TempRepo();
-
             var device = await tempRepo.GetDevice("mac_address", input.MacAddress);
 
-            int deviceId;
-            var status = "on";
-
-            double totalEnergy;
-
             if (device == null)
+                return BadRequest("Invalid MAC Address");
+
+            var checkStr = device.Secret + input.Timestamp.ToString(DateTimeConstants.InterfaceFormat);
+            var checkHash = checkStr.ComputeSHA256();
+
+            if (checkHash != input.HashedPW)
+                return Content(HttpStatusCode.Forbidden, "Failed to validate device");
+
+            var powerFactor = (input.Irms == 0 || input.Vrms == 0) ? 0.0 : 0.9;
+            var energyUsage = (input.RealPower * input.SampleDuration) / (1000 * 3600);
+            
+            var status = device.Status ? "on" : "off";
+
+            var totalEnergyObj = await tempRepo.GetTotalEnergy(device.ID);
+            var totalEnergy = totalEnergyObj != null ? totalEnergyObj.Value + energyUsage : energyUsage;
+
+            DeviceHub.SendData(input.MacAddress, input.RealPower, energyUsage, powerFactor, input.Vrms, input.Irms, totalEnergy, input.Timestamp);
+            
+            await tempRepo.InsertData("EnergyUsages", device.ID, energyUsage, input.Timestamp);
+            await tempRepo.InsertData("PowerFactors", device.ID, powerFactor, input.Timestamp);
+            await tempRepo.InsertData("RealPowers", device.ID, input.RealPower, input.Timestamp);
+            await tempRepo.InsertData("RmsCurrents", device.ID, input.Irms, input.Timestamp);
+            await tempRepo.InsertData("RmsVoltages", device.ID, input.Vrms, input.Timestamp);
+
+            if (totalEnergyObj == null)
             {
-                totalEnergy = energyUsage;
-                deviceId = await tempRepo.InsertDevice(new Device() { MacAddress = input.MacAddress });
+                await tempRepo.InsertTotalEnergy(device.ID, totalEnergy);
             }
             else
             {
-                deviceId = device.ID;
-                status = device.Status ? "on" : "off";
-
-                var totalEnergyObj = await tempRepo.GetTotalEnergy(deviceId);
-                totalEnergy = totalEnergyObj.Value + energyUsage;
-            }
-
-            DeviceHub.SendData(input.MacAddress, realPower, energyUsage, powerFactor, vrms, irms, totalEnergy, input.Timestamp);
-
-            //await tempRepo.InsertData("ApparentPowers", deviceId, input.ApparentPower, input.Timestamp);
-            await tempRepo.InsertData("EnergyUsages", deviceId, energyUsage, input.Timestamp);
-            //await tempRepo.InsertData("Frequencies", deviceId, input.Frequency, input.Timestamp);
-            await tempRepo.InsertData("PowerFactors", deviceId, powerFactor, input.Timestamp);
-            await tempRepo.InsertData("RealPowers", deviceId, realPower, input.Timestamp);
-            await tempRepo.InsertData("RmsCurrents", deviceId, irms, input.Timestamp);
-            await tempRepo.InsertData("RmsVoltages", deviceId, vrms, input.Timestamp);
-
-            if (device == null)
-            {
-                await tempRepo.InsertTotalEnergy(deviceId, totalEnergy);
-            }
-            else
-            {
-                await tempRepo.UpdateTotalEnergy(deviceId, totalEnergy);
+                await tempRepo.UpdateTotalEnergy(device.ID, totalEnergy);
             }
 
             return Ok(new MeasuredDataResponse() { DeviceStatus = status });

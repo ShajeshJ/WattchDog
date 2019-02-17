@@ -15,20 +15,16 @@ namespace WattchDog.Models
         public string MacAddress { get; set; }
 
         [Required]
-        [JsonProperty("minvoltage")]
-        public double MinVoltage { get; set; }
+        [JsonProperty("power")]
+        public double RealPower { get; set; }
 
         [Required]
-        [JsonProperty("maxvoltage")]
-        public double MaxVoltage { get; set; }
+        [JsonProperty("vrms")]
+        public double Vrms { get; set; }
 
         [Required]
-        [JsonProperty("mincurrent")]
-        public double MinCurrent { get; set; }
-        
-        [Required]
-        [JsonProperty("maxcurrent")]
-        public double MaxCurrent { get; set; }
+        [JsonProperty("irms")]
+        public double Irms { get; set; }
 
         [Required]
         [JsonProperty("timestamp")]
@@ -37,6 +33,26 @@ namespace WattchDog.Models
         [Required]
         [JsonProperty("sampletime")]
         public double SampleDuration { get; set; }
+
+        [Required]
+        [JsonProperty("hashed_pw")]
+        public string HashedPW { get; set; }
+
+        //[Required]
+        //[JsonProperty("minvoltage")]
+        //public double MinVoltage { get; set; }
+
+        //[Required]
+        //[JsonProperty("maxvoltage")]
+        //public double MaxVoltage { get; set; }
+
+        //[Required]
+        //[JsonProperty("mincurrent")]
+        //public double MinCurrent { get; set; }
+
+        //[Required]
+        //[JsonProperty("maxcurrent")]
+        //public double MaxCurrent { get; set; }
     }
 
     public class MeasuredDataResponse
