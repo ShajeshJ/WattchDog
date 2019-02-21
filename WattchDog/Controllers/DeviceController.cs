@@ -12,7 +12,6 @@ using WattchDog.Models.Enums;
 
 namespace WattchDog.Controllers
 {
-    [RequireHttpsInProd]
     [UserOnly]
     public class DeviceController : Controller
     {

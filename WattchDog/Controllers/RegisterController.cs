@@ -12,7 +12,6 @@ using WattchDog.Utilities;
 
 namespace WattchDog.Controllers
 {
-    [RequireHttpsInProd]
     public class RegisterController : Controller
     {
         [HttpGet]
