@@ -209,15 +209,22 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Attributes\AnonymousOnlyAttribute.cs" />
+    <Compile Include="Attributes\RequireHttpsInProdAttribute.cs" />
+    <Compile Include="Attributes\UniqueEmailAttribute.cs" />
+    <Compile Include="Attributes\UniqueUsernameAttribute.cs" />
+    <Compile Include="Attributes\UserOnlyAttribute.cs" />
     <Compile Include="Constants\DateTimeConstants.cs" />
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\DeviceController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\DeviceHub.cs" />
+    <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Models\MonthlyDataViewModel.cs" />
     <Compile Include="Models\Enums\DeviceDataType.cs" />
     <Compile Include="Models\DailyDataViewModel.cs" />
@@ -225,8 +232,10 @@
     <Compile Include="Models\RealtimeDataViewModel.cs" />
     <Compile Include="Models\DeviceViewModel.cs" />
     <Compile Include="Models\MeasuredDataDTO.cs" />
+    <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="Utilities\CryptoUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -281,7 +290,6 @@
     <Content Include="Content\Site.css" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Device\Index.cshtml" />
@@ -289,6 +297,9 @@
     <Content Include="Views\Device\Hourly.cshtml" />
     <Content Include="Views\Device\Daily.cshtml" />
     <Content Include="Views\Device\Monthly.cshtml" />
+    <Content Include="Views\Login\Index.cshtml" />
+    <Content Include="Views\Register\Index.cshtml" />
+    <Content Include="Views\Shared\_AnonLayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

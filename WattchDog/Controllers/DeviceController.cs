@@ -6,14 +6,17 @@ using System.Web;
 using System.Web.Mvc;
 using WattchDB;
 using WattchDB.Models;
+using WattchDog.Attributes;
 using WattchDog.Models;
 using WattchDog.Models.Enums;
 
 namespace WattchDog.Controllers
 {
+    [RequireHttpsInProd]
+    [UserOnly]
     public class DeviceController : Controller
     {
-        // GET: Device
+        [HttpGet]
         public ActionResult Index()
         {
             ViewBag.Title = "WattchDog - Devices";
@@ -24,6 +27,7 @@ namespace WattchDog.Controllers
             return View(devices);
         }
         
+        [HttpPost]
         public ActionResult EditName(string macaddress, string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -39,6 +43,7 @@ namespace WattchDog.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
         public ActionResult EditStatus(string macaddress, bool status)
         {
             var repo = new TempRepo();
@@ -47,6 +52,7 @@ namespace WattchDog.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
         public ActionResult Realtime(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Realtime Device Data";
@@ -86,6 +92,7 @@ namespace WattchDog.Controllers
             return View(deviceData);
         }
 
+        [HttpGet]
         public ActionResult Hourly(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Hourly Device Data";
@@ -156,6 +163,7 @@ namespace WattchDog.Controllers
             return View(aggregatetdData);
         }
 
+        [HttpGet]
         public ActionResult Daily(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Daily Device Data";
@@ -226,6 +234,7 @@ namespace WattchDog.Controllers
             return View(aggregatetdData);
         }
 
+        [HttpGet]
         public ActionResult Monthly(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Monthly Device Data";

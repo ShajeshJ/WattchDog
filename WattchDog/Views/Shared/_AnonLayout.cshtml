@@ -16,17 +16,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("WattchDog", "Index", "Device", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("WattchDog", "Index", "Login", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Devices", "Index", "Device", new { area = "" }, null)</li>
-                </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="#" onclick="$('#logout').submit()">Logout</a>
-                        @using (Html.BeginForm("Logout", "Login", FormMethod.Post, new { @id = "logout", @style = "display: none" })) { }
-                    </li>
+                    <li>@Html.ActionLink("Register", "Index", "Register", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("Login", "Index", "Login", new { area = "" }, null)</li>
                 </ul>
             </div>
         </div>

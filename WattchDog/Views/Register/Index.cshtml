@@ -1,0 +1,69 @@
+﻿@model WattchDog.Models.RegisterViewModel
+
+<div class="container">
+    <div class="login-form">
+        <h2>Register</h2>
+        @using (Html.BeginForm("Index", "Register", FormMethod.Post))
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.Username, "Username", new { })
+                @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+                <div style="color:crimson">
+                    @Html.ValidationMessageFor(m => m.Username)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, "Password", new { })
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                <div style="color:crimson">
+                    @Html.ValidationMessageFor(m => m.Password)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.FirstName, "First Name", new { })
+                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                <div style="color:crimson">
+                    @Html.ValidationMessageFor(m => m.FirstName)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.LastName, "Last Name", new { })
+                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                <div style="color:crimson">
+                    @Html.ValidationMessageFor(m => m.LastName)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, "Email", new { })
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                <div style="color:crimson">
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+            </div>
+
+            <input type="submit" value="Submit" class="btn btn-primary" />
+            <br />
+            <br />
+
+            if (!string.IsNullOrEmpty(ViewBag.Error))
+            {
+                <div class="alert alert-danger alert-dismissible fade in" style="width:300px">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <strong>Error:</strong> @ViewBag.Error
+                </div>
+            }
+
+            if (!string.IsNullOrEmpty(ViewBag.Success))
+            {
+                <div class="alert alert-success alert-dismissible fade in" style="width:300px">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <strong>@ViewBag.Success</strong>
+                </div>
+            }
+        }
+    </div>
+</div>

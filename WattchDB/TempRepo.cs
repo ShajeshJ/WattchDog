@@ -3,8 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using WattchDB.Attributes;
 using WattchDB.Models;
 
 namespace WattchDB
@@ -293,6 +296,78 @@ namespace WattchDB
             }
 
             await _connection.CloseAsync();
+        }
+
+        #endregion
+
+        #region User Table Interactions
+
+        public async Task<User> GetUser(string column, object value)
+        {
+            User result = null;
+
+            await _connection.OpenAsync();
+
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = "SELECT * FROM Users WHERE " + column + " = @value";
+                cmd.Parameters.AddWithValue("@value", value);
+
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (reader != null && await reader.ReadAsync())
+                    {
+                        result = new User();
+
+                        result.ID = (int)reader["id"];
+                        result.Username = reader["username"] as string;
+                        result.FirstName = reader["first_name"] as string;
+                        result.LastName = reader["last_name"] as string;
+                        result.Email = reader["email"] as string;
+                        result.Password = reader["password"] as string;
+                        result.Salt = reader["salt"] as string;
+                        result.Created = (DateTime)reader["created"];
+
+                        reader.Close();
+                    }
+                }
+            }
+
+            await _connection.CloseAsync();
+
+            return result;
+        }
+
+        public async Task<User> GetUser<TProperty>(Expression<Func<User, TProperty>> property, object value)
+        {
+            var propertyInfo = ((MemberExpression)property.Body).Member as PropertyInfo;
+            var colAttr = (SqlColumnAttribute)propertyInfo.GetCustomAttribute(typeof(SqlColumnAttribute), false);
+            var column = colAttr.Column;
+
+            var result = await GetUser(column, value);
+            return result;
+        }
+
+        public async Task<bool> InsertUser(User user)
+        {
+            await _connection.OpenAsync();
+            int result;
+
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = @"INSERT INTO Users (username, first_name, last_name, email, password, salt)
+                                    VALUES(@username, @firstname, @lastname, @email, @password, @salt)";
+                cmd.Parameters.AddWithValue("@username", user.Username);
+                cmd.Parameters.AddWithValue("@firstname", user.FirstName);
+                cmd.Parameters.AddWithValue("@lastname", user.LastName);
+                cmd.Parameters.AddWithValue("@email", user.Email);
+                cmd.Parameters.AddWithValue("@password", user.Password);
+                cmd.Parameters.AddWithValue("@salt", user.Salt);
+
+                result = await cmd.ExecuteNonQueryAsync();
+            }
+
+            return result > 0;
         }
 
         #endregion

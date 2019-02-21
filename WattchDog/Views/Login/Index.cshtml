@@ -1,0 +1,36 @@
+﻿@model WattchDog.Models.LoginViewModel
+
+<div class="container">
+    <div class="login-form">
+        <h2>Login</h2>
+        @using (Html.BeginForm("Index", "Login", FormMethod.Post))
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.Username, "Username", new { })
+                @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+                <div style="color:crimson">
+                    @Html.ValidationMessageFor(m => m.Username)
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, "Password", new { })
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                <div style="color:crimson">
+                    @Html.ValidationMessageFor(m => m.Password)
+                </div>
+            </div>
+
+            <input type="submit" value="Submit" class="btn btn-primary" />
+            <br />
+            <br />
+            if(!string.IsNullOrEmpty(ViewBag.Error))
+            {
+                <div class="alert alert-danger alert-dismissible fade in" style="width:300px">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <strong>Error:</strong> @ViewBag.Error
+                </div>
+            }
+        }
+    </div>
+</div>
