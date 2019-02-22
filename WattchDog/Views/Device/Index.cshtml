@@ -64,7 +64,7 @@
                                }
                                 else
                                 {
-                                        @Html.ActionLink("ON", "EditStatus", "Device", new { macaddress = device.MacAddress, status = true }, new { @class = "btn btn-success", @style = "width:75px" });
+                                    @Html.ActionLink("ON", "EditStatus", "Device", new { macaddress = device.MacAddress, status = true }, new { @class = "btn btn-success", @style = "width:75px" });
                                     <a class="btn btn-danger" style="width:75px" disabled>OFF</a>
                                 }
                             </td>

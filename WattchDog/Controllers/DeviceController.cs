@@ -46,8 +46,7 @@ namespace WattchDog.Controllers
 
             return RedirectToAction("Index");
         }
-
-        [HttpPost]
+        
         public ActionResult EditStatus(string macaddress, bool status)
         {
             var repo = new TempRepo();
@@ -87,6 +86,7 @@ namespace WattchDog.Controllers
         public ActionResult Realtime(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Realtime Device Data";
+            TempData["data_type"] = type;
 
             string table = "";
             switch(type)
@@ -133,6 +133,7 @@ namespace WattchDog.Controllers
         public ActionResult Hourly(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Hourly Device Data";
+            TempData["data_type"] = type;
 
             string table = "";
             switch (type)
@@ -210,6 +211,7 @@ namespace WattchDog.Controllers
         public ActionResult Daily(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Daily Device Data";
+            TempData["data_type"] = type;
 
             string table = "";
             switch (type)
@@ -287,6 +289,7 @@ namespace WattchDog.Controllers
         public ActionResult Monthly(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
         {
             ViewBag.Title = "WattchDog - Monthly Device Data";
+            TempData["data_type"] = type;
 
             string table = "";
             switch (type)

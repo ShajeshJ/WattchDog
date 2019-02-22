@@ -1,5 +1,6 @@
 ﻿@using WattchDog.Models.Enums;
 @model  WattchDog.Models.MonthlyDataViewModel
+@{TempData["data_type"] = TempData["data_type"] ?? DeviceDataType.RealPower;}
 
 <h2>
     @if (Model.Device.Status)
@@ -10,16 +11,16 @@
     {
         <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
     }
-    @(Model.Device.Name ?? "{ Unnamed }") - Monthly Data
+    @(Model.Device.Name ?? "{ Unnamed }")
 </h2>
 
 <div class="container">
     <div class="row">
         <div class="col-md-12" align="center">
-            @Html.ActionLink("Hourly", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Daily", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Monthly", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;", @disabled = "disabled" })
-            @Html.ActionLink("Realtime", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Hourly", "Hourly", new { macaddress = Model.Device.MacAddress, type = (DeviceDataType)TempData["data_type"] }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Daily", "Daily", new { macaddress = Model.Device.MacAddress, type = (DeviceDataType)TempData["data_type"] }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Monthly", "Monthly", new { macaddress = Model.Device.MacAddress, type = (DeviceDataType)TempData["data_type"] }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;", @disabled = "disabled" })
+            @Html.ActionLink("Realtime", "Realtime", new { macaddress = Model.Device.MacAddress, type = (DeviceDataType)TempData["data_type"] }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
         </div>
     </div>
     <hr/>

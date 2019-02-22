@@ -1,5 +1,6 @@
 ﻿@using WattchDog.Models.Enums;
 @model  WattchDog.Models.RealtimeDataViewModel
+@{TempData["data_type"] = TempData["data_type"] ?? DeviceDataType.RealPower;}
 
 <h2>
     @if (Model.Device.Status)
@@ -10,16 +11,16 @@
     {
         <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
     }
-    @(Model.Device.Name ?? "{ Unnamed }") - Realtime Data
+    @(Model.Device.Name ?? "{ Unnamed }")
 </h2>
 
 <div class="container">
     <div class="row">
         <div class="col-md-12" align="center">
-            @Html.ActionLink("Hourly", "Hourly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Daily", "Daily", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Monthly", "Monthly", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
-            @Html.ActionLink("Realtime", "Realtime", new { macaddress = Model.Device.MacAddress, type = DeviceDataType.RealPower }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;", @disabled = "disabled" })
+            @Html.ActionLink("Hourly", "Hourly", new { macaddress = Model.Device.MacAddress, type = (DeviceDataType)TempData["data_type"] }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Daily", "Daily", new { macaddress = Model.Device.MacAddress, type = (DeviceDataType)TempData["data_type"] }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Monthly", "Monthly", new { macaddress = Model.Device.MacAddress, type = (DeviceDataType)TempData["data_type"] }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;" })
+            @Html.ActionLink("Realtime", "Realtime", new { macaddress = Model.Device.MacAddress, type = (DeviceDataType)TempData["data_type"] }, new { @class = "btn btn-default", @style = "margin-bottom:5px; width: 115px;", @disabled = "disabled" })
         </div>
     </div>
     <hr />
@@ -63,19 +64,19 @@
                 text: @switch (Model.Type)
                 {
                     case DeviceDataType.EnergyUsage:
-                        @:'Energy Usage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Realtime Energy Usage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                     case DeviceDataType.Irms:
-                        @:'Rms Current of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Realtime Rms Current of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                     case DeviceDataType.PowerFactor:
-                        @:'Power Factor of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Realtime Power Factor of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                     case DeviceDataType.RealPower:
-                        @:'Real Power of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Realtime Real Power of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                     default:
-                        @:'Rms Voltage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
+                        @:'Realtime Rms Voltage of @(Model.Device.Name ?? @Model.Device.MacAddress)'
                         break;
                 }
             };
