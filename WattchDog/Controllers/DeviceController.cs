@@ -21,7 +21,7 @@ namespace WattchDog.Controllers
             ViewBag.Title = "WattchDog - Devices";
 
             var repo = new TempRepo();
-            var devices = repo.GetAllDevices().Result.Select(d => (DeviceViewModel)d);
+            var devices = repo.GetAllDevices(d => d.UserId, Session["UID"]).Result.Select(d => (DeviceViewModel)d);
 
             return View(devices);
         }
@@ -36,7 +36,12 @@ namespace WattchDog.Controllers
             else
             {
                 var repo = new TempRepo();
-                repo.UpdateDeviceName("mac_address", macaddress, name).Wait();
+                var device = repo.GetDevice(d => d.MacAddress, macaddress).Result;
+
+                if (device.UserId == Session["UID"] as int?)
+                {
+                    repo.UpdateDeviceName("mac_address", macaddress, name).Wait();
+                }
             }
 
             return RedirectToAction("Index");
@@ -46,7 +51,34 @@ namespace WattchDog.Controllers
         public ActionResult EditStatus(string macaddress, bool status)
         {
             var repo = new TempRepo();
-            repo.UpdateDeviceStatus("mac_address", macaddress, status).Wait();
+            var device = repo.GetDevice(d => d.MacAddress, macaddress).Result;
+
+            if (device.UserId == Session["UID"] as int?)
+            {
+                repo.UpdateDeviceStatus("mac_address", macaddress, status).Wait();
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult AddDevice(string macaddress)
+        {
+            var repo = new TempRepo();
+            var device = repo.GetDevice(d => d.MacAddress, macaddress).Result;
+
+            if (device == null)
+            {
+                TempData["error"] = "Invalid MAC address";
+            }
+            else if (device.UserId != null)
+            {
+                TempData["error"] = "Device has already been registered to another account";
+            }
+            else
+            {
+                repo.UpdateDeviceOwner("mac_address", macaddress, (int)Session["UID"]).Wait();
+            }
 
             return RedirectToAction("Index");
         }
@@ -81,6 +113,12 @@ namespace WattchDog.Controllers
             var deviceData = new RealtimeDataViewModel();
 
             var device = repo.GetDevice("mac_address", macaddress).Result;
+
+            if (device.UserId != Session["UID"] as int?)
+            {
+                return RedirectToAction("Index");
+            }
+
             deviceData.Device = (DeviceViewModel)device;
 
             var data = repo.GetData(table, device.ID, 10).Result.Select(d => (DataViewModel)d);
@@ -121,6 +159,12 @@ namespace WattchDog.Controllers
             var aggregatetdData = new HourlyDataViewModel();
 
             var device = repo.GetDevice("mac_address", macaddress).Result;
+
+            if (device.UserId != Session["UID"] as int?)
+            {
+                return RedirectToAction("Index");
+            }
+
             aggregatetdData.Device = (DeviceViewModel)device;
 
             var curTime = TimeZoneInfo.ConvertTime(DateTime.Now, 
@@ -192,6 +236,12 @@ namespace WattchDog.Controllers
             var aggregatetdData = new DailyDataViewModel();
 
             var device = repo.GetDevice("mac_address", macaddress).Result;
+
+            if (device.UserId != Session["UID"] as int?)
+            {
+                return RedirectToAction("Index");
+            }
+
             aggregatetdData.Device = (DeviceViewModel)device;
 
             var curTime = TimeZoneInfo.ConvertTime(DateTime.Now,
@@ -263,6 +313,12 @@ namespace WattchDog.Controllers
             var aggregatetdData = new MonthlyDataViewModel();
 
             var device = repo.GetDevice("mac_address", macaddress).Result;
+
+            if (device.UserId != Session["UID"] as int?)
+            {
+                return RedirectToAction("Index");
+            }
+
             aggregatetdData.Device = (DeviceViewModel)device;
 
             var curTime = TimeZoneInfo.ConvertTime(DateTime.Now,

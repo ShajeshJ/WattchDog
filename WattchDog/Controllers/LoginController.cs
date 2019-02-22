@@ -17,7 +17,6 @@ namespace WattchDog.Controllers
         [AnonymousOnly]
         public ActionResult Index()
         {
-            ViewBag.Error = null;
             return View(new LoginViewModel());
         }
 
@@ -39,7 +38,7 @@ namespace WattchDog.Controllers
 
             if (user?.Password != checkPW)
             {
-                ViewBag.Error = "Invalid username and password combination.";
+                TempData["error"] = "Invalid username and password combination.";
                 input.Password = "";
                 return View(input);
             }

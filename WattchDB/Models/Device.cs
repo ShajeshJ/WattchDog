@@ -27,5 +27,8 @@ namespace WattchDB.Models
 
         [SqlColumn("secret")]
         public string Secret { get; set; }
+
+        [SqlColumn("user_id")]
+        public int? UserId { get; set; }
     }
 }

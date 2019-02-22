@@ -24,11 +24,11 @@
             <input type="submit" value="Submit" class="btn btn-primary" />
             <br />
             <br />
-            if(!string.IsNullOrEmpty(ViewBag.Error))
+            if(!string.IsNullOrEmpty(TempData["error"] as string))
             {
                 <div class="alert alert-danger alert-dismissible fade in" style="width:300px">
                     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                    <strong>Error:</strong> @ViewBag.Error
+                    <strong>Error:</strong> @(TempData["error"] as string)
                 </div>
             }
         }

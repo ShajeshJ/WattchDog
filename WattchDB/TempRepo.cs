@@ -66,6 +66,7 @@ namespace WattchDB
                         result.Created = (DateTime)reader["created"];
                         result.Status = (bool)reader["status"];
                         result.Secret = reader["secret"] as string;
+                        result.UserId = reader["user_id"] as int?;
 
                         reader.Close();
                     }
@@ -77,7 +78,17 @@ namespace WattchDB
             return result;
         }
 
-        public async Task<IEnumerable<Device>> GetAllDevices()
+        public async Task<Device> GetDevice<TProperty>(Expression<Func<Device, TProperty>> property, object value)
+        {
+            var propertyInfo = ((MemberExpression)property.Body).Member as PropertyInfo;
+            var colAttr = (SqlColumnAttribute)propertyInfo.GetCustomAttribute(typeof(SqlColumnAttribute), false);
+            var column = colAttr.Column;
+
+            var result = await GetDevice(column, value);
+            return result;
+        }
+
+        public async Task<IEnumerable<Device>> GetAllDevices(string column = null, object value = null)
         {
             List<Device> result = new List<Device>();
 
@@ -86,6 +97,12 @@ namespace WattchDB
             using (var cmd = _connection.CreateCommand())
             {
                 cmd.CommandText = "SELECT * FROM Devices";
+                if (column != null)
+                {
+                    cmd.CommandText += " WHERE " + column + " = @value";
+                    cmd.Parameters.AddWithValue("@value", value);
+
+                }
 
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
@@ -101,6 +118,7 @@ namespace WattchDB
                             device.Created = (DateTime)reader["created"];
                             device.Status = (bool)reader["status"];
                             device.Secret = reader["secret"] as string;
+                            device.UserId = reader["user_id"] as int?;
 
                             result.Add(device);
                         }
@@ -112,6 +130,16 @@ namespace WattchDB
 
             await _connection.CloseAsync();
 
+            return result;
+        }
+
+        public async Task<IEnumerable<Device>> GetAllDevices<TProperty>(Expression<Func<Device, TProperty>> property, object value)
+        {
+            var propertyInfo = ((MemberExpression)property.Body).Member as PropertyInfo;
+            var colAttr = (SqlColumnAttribute)propertyInfo.GetCustomAttribute(typeof(SqlColumnAttribute), false);
+            var column = colAttr.Column;
+
+            var result = await GetAllDevices(column, value);
             return result;
         }
 
@@ -138,6 +166,21 @@ namespace WattchDB
             {
                 cmd.CommandText = "UPDATE Devices SET status = @status WHERE " + searchCol + " = @searchVal";
                 cmd.Parameters.AddWithValue("@status", status);
+                cmd.Parameters.AddWithValue("@searchVal", searchVal);
+                await cmd.ExecuteNonQueryAsync();
+            }
+
+            await _connection.CloseAsync();
+        }
+
+        public async Task UpdateDeviceOwner(string searchCol, string searchVal, int userId)
+        {
+            await _connection.OpenAsync();
+
+            using (var cmd = _connection.CreateCommand())
+            {
+                cmd.CommandText = "UPDATE Devices SET user_id = @user_id WHERE " + searchCol + " = @searchVal";
+                cmd.Parameters.AddWithValue("@user_id", userId);
                 cmd.Parameters.AddWithValue("@searchVal", searchVal);
                 await cmd.ExecuteNonQueryAsync();
             }

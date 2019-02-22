@@ -18,8 +18,6 @@ namespace WattchDog.Controllers
         [AnonymousOnly]
         public ActionResult Index()
         {
-            ViewBag.Success = null;
-            ViewBag.Error = null;
             return View(new RegisterViewModel());
         }
 
@@ -49,14 +47,13 @@ namespace WattchDog.Controllers
             
             if (!success)
             {
-                ViewBag.Success = null;
-                ViewBag.Error = "Failed to create the account. Please try again.";
+                TempData["error"] = "Failed to create the account. Please try again.";
                 input.Password = "";
                 return View(input);
             }
             else
             {
-                ViewBag.Success = "Successfully Registered!";
+                TempData["success"] = "Successfully Registered!";
                 ViewBag.Error = null;
                 return View(new RegisterViewModel());
             }
