@@ -24,7 +24,14 @@ namespace WattchDog.Models
 
         public static explicit operator DataViewModel(Data obj)
         {
-            return new DataViewModel { Value = obj.Value, Time = obj.TimeRecorded };
+            if (obj.Type.ToLower() == "energyusages")
+            {
+                return new DataViewModel { Value = Math.Round(obj.Value, 7), Time = obj.TimeRecorded };
+            }
+            else
+            {
+                return new DataViewModel { Value = Math.Round(obj.Value, 2), Time = obj.TimeRecorded };
+            }
         }
     }
 }

@@ -184,7 +184,7 @@ namespace WattchDog.Controllers
                     {
                         Hour = data[0].GroupedDate,
                         NumSamples = data[0].NumSamples,
-                        Value = data[0].AvgValue
+                        Value = type == DeviceDataType.EnergyUsage ? Math.Round(data[0].AvgValue, 7) : Math.Round(data[0].AvgValue, 2)
                     });
                     data.RemoveAt(0);
                 }
@@ -262,7 +262,7 @@ namespace WattchDog.Controllers
                     {
                         Date = data[0].GroupedDate,
                         NumSamples = data[0].NumSamples,
-                        Value = data[0].AvgValue
+                        Value = type == DeviceDataType.EnergyUsage ? Math.Round(data[0].AvgValue, 7) : Math.Round(data[0].AvgValue, 2)
                     });
                     data.RemoveAt(0);
                 }
@@ -340,7 +340,7 @@ namespace WattchDog.Controllers
                     {
                         Month = data[0].GroupedDate,
                         NumSamples = data[0].NumSamples,
-                        Value = data[0].AvgValue
+                        Value = type == DeviceDataType.EnergyUsage ? Math.Round(data[0].AvgValue, 7) : Math.Round(data[0].AvgValue, 2)
                     });
                     data.RemoveAt(0);
                 }
