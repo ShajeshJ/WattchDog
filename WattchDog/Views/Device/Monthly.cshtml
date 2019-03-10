@@ -107,6 +107,16 @@
                             @:'Rms Voltage (Vrms)'
                             break;
                     }
+                },
+                labels: {
+                    @if (Model.Type == DeviceDataType.EnergyUsage)
+                    {
+                        @:format: '{value:.7f}'
+                    }
+                    else
+                    {
+                        @:format: '{value:.2f}'
+                    }
                 }
             };
 
