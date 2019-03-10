@@ -47,14 +47,35 @@ namespace WattchDog.Controllers
             return RedirectToAction("Index");
         }
         
-        public ActionResult EditStatus(string macaddress, bool status)
+        public ActionResult EditStatus(string macaddress, int status, string start = null, string end = null)
         {
+            DeviceSchedule schedule = null;
+            if (status == 2)
+            {
+                var success = DateTime.TryParseExact(start, "H:mm:ss", null, System.Globalization.DateTimeStyles.None, out var startTime);
+                success = DateTime.TryParseExact(end, "H:mm:ss", null, System.Globalization.DateTimeStyles.None, out var endTime) | success;
+
+                if (!success)
+                {
+                    TempData["error"] = "Invalid start or end time format (must have format H:mm:ss).";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    schedule = new DeviceSchedule()
+                    {
+                        StartTime = startTime.ToString("HH:mm:ss"),
+                        EndTime = endTime.ToString("HH:mm:ss")
+                    };
+                }
+            }
+
             var repo = new TempRepo();
             var device = repo.GetDevice(d => d.MacAddress, macaddress).Result;
 
             if (device.UserId == Session["UID"] as int?)
             {
-                repo.UpdateDeviceStatus("mac_address", macaddress, status).Wait();
+                repo.UpdateDeviceStatus("mac_address", macaddress, status, schedule).Wait();
             }
 
             return RedirectToAction("Index");
@@ -83,7 +104,7 @@ namespace WattchDog.Controllers
         }
 
         [HttpGet]
-        public ActionResult Realtime(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
+        public ActionResult Realtime(string macaddress, DeviceDataType type = DeviceDataType.EnergyUsage)
         {
             ViewBag.Title = "WattchDog - Realtime Device Data";
             TempData["data_type"] = type;
@@ -130,7 +151,7 @@ namespace WattchDog.Controllers
         }
 
         [HttpGet]
-        public ActionResult Hourly(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
+        public ActionResult Hourly(string macaddress, DeviceDataType type = DeviceDataType.EnergyUsage)
         {
             ViewBag.Title = "WattchDog - Hourly Device Data";
             TempData["data_type"] = type;
@@ -208,7 +229,7 @@ namespace WattchDog.Controllers
         }
 
         [HttpGet]
-        public ActionResult Daily(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
+        public ActionResult Daily(string macaddress, DeviceDataType type = DeviceDataType.EnergyUsage)
         {
             ViewBag.Title = "WattchDog - Daily Device Data";
             TempData["data_type"] = type;
@@ -286,7 +307,7 @@ namespace WattchDog.Controllers
         }
 
         [HttpGet]
-        public ActionResult Monthly(string macaddress, DeviceDataType type = DeviceDataType.RealPower)
+        public ActionResult Monthly(string macaddress, DeviceDataType type = DeviceDataType.EnergyUsage)
         {
             ViewBag.Title = "WattchDog - Monthly Device Data";
             TempData["data_type"] = type;

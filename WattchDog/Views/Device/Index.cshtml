@@ -37,13 +37,13 @@
                     {
                         <tr>
                             <td>
-                                @if (device.Status)
+                                @if (device.Status == 0)
                                 {
-                                    <span class="glyphicon glyphicon-ok-circle" style="color:#5cb85c"></span>
+                                    <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
                                 }
                                 else
                                 {
-                                    <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
+                                    <span class="glyphicon glyphicon-ok-circle" style="color:#5cb85c"></span>
                                 }
                                 @Html.ActionLink(device.Name ?? "{ Unnamed }", "Realtime", new { macaddress = device.MacAddress }, null)
                             </td>
@@ -57,16 +57,61 @@
                                 }
                             </td>
                             <td>
-                                @if (device.Status)
+                                @if (device.Status == 1)
                                 {
-                                    <a class="btn btn-success" style="width:75px" disabled>ON</a>
-                                    @Html.ActionLink("OFF", "EditStatus", "Device", new { macaddress = device.MacAddress, status = false }, new { @class = "btn btn-danger", @style = "width:75px" });
-                               }
+                                    <a class="btn btn-success" style="width:85px" disabled>ON</a>
+                                    @Html.ActionLink("OFF", "EditStatus", "Device", new { macaddress = device.MacAddress, status = 0 }, new { @class = "btn btn-danger", @style = "width:85px" });
+                                }
+                                else if (device.Status == 0)
+                                {
+                                    @Html.ActionLink("ON", "EditStatus", "Device", new { macaddress = device.MacAddress, status = 1 }, new { @class = "btn btn-success", @style = "width:85px" });
+                                    <a class="btn btn-danger" style="width:85px" disabled>OFF</a>
+                                }
                                 else
                                 {
-                                    @Html.ActionLink("ON", "EditStatus", "Device", new { macaddress = device.MacAddress, status = true }, new { @class = "btn btn-success", @style = "width:75px" });
-                                    <a class="btn btn-danger" style="width:75px" disabled>OFF</a>
+                                    @Html.ActionLink("ON", "EditStatus", "Device", new { macaddress = device.MacAddress, status = 1 }, new { @class = "btn btn-success", @style = "width:85px" });
+                                    @Html.ActionLink("OFF", "EditStatus", "Device", new { macaddress = device.MacAddress, status = 0 }, new { @class = "btn btn-danger", @style = "width:85px" });
                                 }
+
+                                <a href="#@(device.MacAddress.Replace(":", ""))-Schedule" class="btn btn-primary" style="width:85px" data-toggle="modal">Schedule</a>
+
+                                <div id="@(device.MacAddress.Replace(":", ""))-Schedule" class="modal fade">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                <h4 class="modal-title">Schedule</h4>
+                                            </div>
+                                            @using (Html.BeginForm("EditStatus", "Device", FormMethod.Post, new { @class = "form-horizontal" }))
+                                            {
+                                                <div class="modal-body">
+                                                    <p>Enter the time range for which the device should be turned on.</p>
+                                                
+                                                        @Html.Hidden("macaddress", device.MacAddress)
+                                                        @Html.Hidden("status", 2)
+                                                        
+                                                        <div class="form-group">
+                                                            @Html.Label("start", "Start Time", new { @class = "control-label col-sm-4" })
+                                                            <div class="col-sm-8">
+                                                                @Html.TextBox("start", device.ScheduleStart, new { @placeholder = "H:mm:ss" })
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="form-group">
+                                                            @Html.Label("end", "End Time", new { @class = "control-label col-sm-4" })
+                                                            <div class="col-sm-8">
+                                                                @Html.TextBox("end", device.ScheduleEnd, new { @placeholder = "H:mm:ss" })
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     }

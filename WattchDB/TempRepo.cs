@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -17,20 +18,20 @@ namespace WattchDB
         private static string _connectionStr = ConfigurationManager.ConnectionStrings["WattchDB"].ConnectionString;
         MySqlConnection _connection;
 
-        private static string _hourlyQuery = @"SELECT COUNT(*) as numSamples, AVG(value) as average, DATE(date_recorded) as date, HOUR(date_recorded) as hour
-                                                FROM {0} WHERE device_id=@devId
+        private static string _hourlyQuery = @"SELECT COUNT(*) as numSamples, {0}(value) as average, DATE(date_recorded) as date, HOUR(date_recorded) as hour
+                                                FROM {1} WHERE device_id=@devId
                                                 AND date_recorded >= @mindate AND date_recorded < @maxdate
                                                 GROUP BY date, hour
                                                 ORDER BY date DESC, hour DESC";
 
-        private static string _dailyQuery = @"SELECT COUNT(*) as numSamples, AVG(value) as average, DATE(date_recorded) as date
-                                                FROM {0} WHERE device_id=@devId
+        private static string _dailyQuery = @"SELECT COUNT(*) as numSamples, {0}(value) as average, DATE(date_recorded) as date
+                                                FROM {1} WHERE device_id=@devId
                                                 AND date_recorded >= @mindate AND date_recorded < @maxdate
                                                 GROUP BY date
                                                 ORDER BY date DESC";
 
-        private static string _monthlyQuery = @"SELECT COUNT(*) as numSamples, AVG(value) as average, YEAR(date_recorded) as year, MONTH(date_recorded) as month
-                                                FROM {0} WHERE device_id=@devId
+        private static string _monthlyQuery = @"SELECT COUNT(*) as numSamples, {0}(value) as average, YEAR(date_recorded) as year, MONTH(date_recorded) as month
+                                                FROM {1} WHERE device_id=@devId
                                                 AND date_recorded >= @mindate AND date_recorded < @maxdate
                                                 GROUP BY year, month
                                                 ORDER BY year DESC, month DESC";
@@ -59,14 +60,16 @@ namespace WattchDB
                     if (reader != null && await reader.ReadAsync())
                     {
                         result = new Device();
+                        var schedule = reader["schedule"] as string;
 
                         result.ID = (int)reader["id"];
                         result.Name = reader["name"] as string;
                         result.MacAddress = reader["mac_address"] as string;
                         result.Created = (DateTime)reader["created"];
-                        result.Status = (bool)reader["status"];
+                        result.Status = (int)reader["status"];
                         result.Secret = reader["secret"] as string;
                         result.UserId = reader["user_id"] as int?;
+                        result.Schedule = schedule == null ? null : JsonConvert.DeserializeObject<DeviceSchedule>(schedule);
 
                         reader.Close();
                     }
@@ -111,14 +114,16 @@ namespace WattchDB
                         while (await reader.ReadAsync())
                         {
                             var device = new Device();
+                            var schedule = reader["schedule"] as string;
 
                             device.ID = (int)reader["id"];
                             device.Name = reader["name"] as string;
                             device.MacAddress = reader["mac_address"] as string;
                             device.Created = (DateTime)reader["created"];
-                            device.Status = (bool)reader["status"];
+                            device.Status = (int)reader["status"];
                             device.Secret = reader["secret"] as string;
                             device.UserId = reader["user_id"] as int?;
+                            device.Schedule = schedule == null ? null : JsonConvert.DeserializeObject<DeviceSchedule>(schedule);
 
                             result.Add(device);
                         }
@@ -158,14 +163,15 @@ namespace WattchDB
             await _connection.CloseAsync();
         }
 
-        public async Task UpdateDeviceStatus(string searchCol, string searchVal, bool status)
+        public async Task UpdateDeviceStatus(string searchCol, string searchVal, int status, DeviceSchedule schedule = null)
         {
             await _connection.OpenAsync();
 
             using (var cmd = _connection.CreateCommand())
             {
-                cmd.CommandText = "UPDATE Devices SET status = @status WHERE " + searchCol + " = @searchVal";
+                cmd.CommandText = "UPDATE Devices SET status = @status, schedule = @schedule WHERE " + searchCol + " = @searchVal";
                 cmd.Parameters.AddWithValue("@status", status);
+                cmd.Parameters.AddWithValue("@schedule", schedule == null ? null : JsonConvert.SerializeObject(schedule));
                 cmd.Parameters.AddWithValue("@searchVal", searchVal);
                 await cmd.ExecuteNonQueryAsync();
             }
@@ -256,20 +262,22 @@ namespace WattchDB
 
             string query, minDate, maxDate;
 
+            var aggregator = table == "EnergyUsages" ? "SUM" : "AVG";
+
             switch(groupType)
             {
                 case DateGrouping.Monthly:
-                    query = string.Format(_monthlyQuery, table);
+                    query = string.Format(_monthlyQuery, aggregator, table);
                     minDate = (new DateTime(now.Year, now.Month, 1)).AddYears(-1).ToString("yyyy-MM-dd");
                     maxDate = (new DateTime(now.Year, now.Month, 1)).ToString("yyyy-MM-dd");
                     break;
                 case DateGrouping.Daily:
-                    query = string.Format(_dailyQuery, table);
+                    query = string.Format(_dailyQuery, aggregator, table);
                     minDate = (new DateTime(now.Year, now.Month, now.Day)).AddMonths(-1).ToString("yyyy-MM-dd");
                     maxDate = (new DateTime(now.Year, now.Month, now.Day)).ToString("yyyy-MM-dd");
                     break;
                 default:
-                    query = string.Format(_hourlyQuery, table);
+                    query = string.Format(_hourlyQuery, aggregator, table);
                     minDate = (new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0)).AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
                     maxDate = (new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss");
                     break;

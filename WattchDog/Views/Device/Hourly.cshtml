@@ -3,13 +3,13 @@
 @{TempData["data_type"] = TempData["data_type"] ?? DeviceDataType.EnergyUsage;}
 
 <h2>
-    @if (Model.Device.Status)
+    @if (Model.Device.Status == 0)
     {
-        <span class="glyphicon glyphicon-ok-circle" style="color:#5cb85c"></span>
+        <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
     }
     else
     {
-        <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
+        <span class="glyphicon glyphicon-ok-circle" style="color:#5cb85c"></span>
     }
     @(Model.Device.Name ?? "{ Unnamed }")
 </h2>

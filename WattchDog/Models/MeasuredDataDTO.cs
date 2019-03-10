@@ -58,5 +58,21 @@ namespace WattchDog.Models
     public class MeasuredDataResponse
     {
         public string DeviceStatus { get; set; }
+
+        public ScheduleResponse Schedule { get; set; }
+    }
+
+    public class ScheduleResponse
+    {
+        [JsonProperty("start_time")]
+        public string StartTime { get; set; }
+
+        [JsonProperty("end_time")]
+        public string EndTime { get; set; }
+
+        public static explicit operator ScheduleResponse(DeviceSchedule obj)
+        {
+            return new ScheduleResponse { StartTime = obj.StartTime, EndTime = obj.EndTime };
+        }
     }
 }

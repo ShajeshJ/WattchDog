@@ -35,7 +35,21 @@ namespace WattchDog.Controllers
 
             var powerFactor = (input.Irms == 0 || input.Vrms == 0) ? 0.0 : 0.9;
             var energyUsage = (input.RealPower * input.SampleDuration) / (1000 * 3600);
-            var status = device.Status ? "on" : "off";
+
+            string status;
+            switch (device.Status)
+            {
+                case 2:
+                    status = "schedule";
+                    break;
+                case 1:
+                    status = "on";
+                    break;
+                default:
+                    status = "off";
+                    break;
+            }
+            var schedule = (ScheduleResponse)device.Schedule;
             
             DeviceHub.SendData(input.MacAddress, input.RealPower, energyUsage, powerFactor, input.Vrms, input.Irms, input.Timestamp);
             
@@ -45,7 +59,7 @@ namespace WattchDog.Controllers
             await tempRepo.InsertData("RmsCurrents", device.ID, input.Irms, input.Timestamp);
             await tempRepo.InsertData("RmsVoltages", device.ID, input.Vrms, input.Timestamp);
 
-            return Ok(new MeasuredDataResponse() { DeviceStatus = status });
+            return Ok(new MeasuredDataResponse() { DeviceStatus = status, Schedule = schedule });
         }
     }
 }
