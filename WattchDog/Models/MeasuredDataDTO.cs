@@ -72,7 +72,7 @@ namespace WattchDog.Models
 
         public static explicit operator ScheduleResponse(DeviceSchedule obj)
         {
-            return new ScheduleResponse { StartTime = obj.StartTime, EndTime = obj.EndTime };
+            return new ScheduleResponse { StartTime = obj?.StartTime, EndTime = obj?.EndTime };
         }
     }
 }
