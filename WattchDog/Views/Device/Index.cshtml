@@ -37,13 +37,13 @@
                     {
                         <tr>
                             <td>
-                                @if (device.Status == 0)
+                                @if (device.Connected)
                                 {
-                                    <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f"></span>
+                                    <span class="glyphicon glyphicon-ok-circle" style="color:#5cb85c" title="Connected"></span>
                                 }
                                 else
                                 {
-                                    <span class="glyphicon glyphicon-ok-circle" style="color:#5cb85c"></span>
+                                    <span class="glyphicon glyphicon-remove-circle" style="color:#d9534f" title="Disconnected"></span>
                                 }
                                 @Html.ActionLink(device.Name ?? "{ Unnamed }", "Realtime", new { macaddress = device.MacAddress }, null)
                             </td>

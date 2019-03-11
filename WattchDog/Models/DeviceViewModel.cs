@@ -18,6 +18,8 @@ namespace WattchDog.Models
 
         public string ScheduleEnd { get; set; }
 
+        public bool Connected { get; set; }
+
         public static explicit operator DeviceViewModel(Device obj)
         {
             return new DeviceViewModel {
@@ -25,7 +27,8 @@ namespace WattchDog.Models
                 Name = obj.Name,
                 Status = obj.Status,
                 ScheduleStart = obj.Schedule?.StartTime,
-                ScheduleEnd = obj.Schedule?.EndTime
+                ScheduleEnd = obj.Schedule?.EndTime,
+                Connected = obj.Connected
             };
         }
     }

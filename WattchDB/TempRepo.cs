@@ -52,7 +52,16 @@ namespace WattchDB
 
             using (var cmd = _connection.CreateCommand())
             {
-                cmd.CommandText = "SELECT * FROM Devices WHERE " + column + " = @value";
+                cmd.CommandText = @"SELECT d.*, e.connected FROM Devices d 
+                                    LEFT JOIN(
+                                        SELECT device_id,
+                                            IF(MAX(date_recorded) >= DATE_SUB(CONVERT_TZ(NOW(), 'UTC', 'US/Eastern'), INTERVAL 1 MINUTE),
+                                                1,
+                                                0) as connected
+                                        FROM EnergyUsages
+                                        GROUP BY device_id
+                                    ) e ON d.id = e.device_id 
+                                    WHERE d." + column + @" = @value";
                 cmd.Parameters.AddWithValue("@value", value);
 
                 using (var reader = await cmd.ExecuteReaderAsync())
@@ -70,6 +79,7 @@ namespace WattchDB
                         result.Secret = reader["secret"] as string;
                         result.UserId = reader["user_id"] as int?;
                         result.Schedule = schedule == null ? null : JsonConvert.DeserializeObject<DeviceSchedule>(schedule);
+                        result.Connected = (reader["connected"] as int? ?? 0) == 1;
 
                         reader.Close();
                     }
@@ -99,12 +109,20 @@ namespace WattchDB
 
             using (var cmd = _connection.CreateCommand())
             {
-                cmd.CommandText = "SELECT * FROM Devices";
+                cmd.CommandText = @"SELECT d.*, e.connected FROM Devices d
+                                    LEFT JOIN(
+                                        SELECT device_id,
+                                            IF(MAX(date_recorded) >= DATE_SUB(CONVERT_TZ(NOW(), 'UTC', 'US/Eastern'), INTERVAL 1 MINUTE),
+                                                1,
+                                                0) as connected
+                                        FROM EnergyUsages
+                                        GROUP BY device_id
+                                    ) e ON d.id = e.device_id";
+
                 if (column != null)
                 {
                     cmd.CommandText += " WHERE " + column + " = @value";
                     cmd.Parameters.AddWithValue("@value", value);
-
                 }
 
                 using (var reader = await cmd.ExecuteReaderAsync())
@@ -124,6 +142,7 @@ namespace WattchDB
                             device.Secret = reader["secret"] as string;
                             device.UserId = reader["user_id"] as int?;
                             device.Schedule = schedule == null ? null : JsonConvert.DeserializeObject<DeviceSchedule>(schedule);
+                            device.Connected = (reader["connected"] as int? ?? 0) == 1;
 
                             result.Add(device);
                         }

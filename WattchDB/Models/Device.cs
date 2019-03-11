@@ -34,6 +34,8 @@ namespace WattchDB.Models
 
         [SqlColumn("schedule")]
         public DeviceSchedule Schedule { get; set; }
+
+        public bool Connected { get; set; }
     }
 
     public class DeviceSchedule

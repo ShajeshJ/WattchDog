@@ -33,7 +33,7 @@ namespace WattchDog.Controllers
             if (checkHash != input.HashedPW)
                 return Content(HttpStatusCode.Forbidden, "Failed to validate device");
 
-            var powerFactor = (input.Irms == 0 || input.Vrms == 0) ? 0.0 : 0.9;
+            var powerFactor = (input.Irms == 0 && input.Vrms == 0) ? 0.0 : input.RealPower / (input.Vrms * input.Irms);
             var energyUsage = (input.RealPower * input.SampleDuration) / (1000 * 3600);
 
             string status;
