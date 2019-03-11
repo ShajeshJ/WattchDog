@@ -55,7 +55,7 @@ namespace WattchDB
                 cmd.CommandText = @"SELECT d.*, e.connected FROM Devices d 
                                     LEFT JOIN(
                                         SELECT device_id,
-                                            IF(MAX(date_recorded) >= DATE_SUB(CONVERT_TZ(NOW(), 'UTC', 'US/Eastern'), INTERVAL 1 MINUTE),
+                                            IF(MAX(date_recorded) >= DATE_SUB(CONVERT_TZ(NOW(), 'UTC', 'US/Eastern'), INTERVAL 20 SECOND),
                                                 1,
                                                 0) as connected
                                         FROM EnergyUsages
@@ -112,7 +112,7 @@ namespace WattchDB
                 cmd.CommandText = @"SELECT d.*, e.connected FROM Devices d
                                     LEFT JOIN(
                                         SELECT device_id,
-                                            IF(MAX(date_recorded) >= DATE_SUB(CONVERT_TZ(NOW(), 'UTC', 'US/Eastern'), INTERVAL 1 MINUTE),
+                                            IF(MAX(date_recorded) >= DATE_SUB(CONVERT_TZ(NOW(), 'UTC', 'US/Eastern'), INTERVAL 20 SECOND),
                                                 1,
                                                 0) as connected
                                         FROM EnergyUsages
