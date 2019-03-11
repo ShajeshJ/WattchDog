@@ -17,11 +17,11 @@ namespace WattchDog.Hubs
         {
             var context = GlobalHost.ConnectionManager.GetHubContext<DeviceHub>();
             context.Clients.Group(macAddress).addMeasurements(
-                realPower, 
-                energyUsage, 
-                powerFactor, 
-                vrms, 
-                irms,
+                Math.Round(realPower, 2),
+                Math.Round(energyUsage, 7),
+                Math.Round(powerFactor, 2),
+                Math.Round(vrms, 2),
+                Math.Round(irms, 2),
                 date);
         }
     }
