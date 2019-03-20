@@ -53,12 +53,17 @@ namespace WattchDog.Controllers
             DeviceSchedule schedule = null;
             if (status == 2)
             {
-                var success = DateTime.TryParseExact(start, "H:mm:ss", null, System.Globalization.DateTimeStyles.None, out var startTime);
-                success = DateTime.TryParseExact(end, "H:mm:ss", null, System.Globalization.DateTimeStyles.None, out var endTime) | success;
+                var startSuccess = DateTime.TryParseExact(start, "H:mm:ss", null, System.Globalization.DateTimeStyles.None, out var startTime);
+                var endSuccess = DateTime.TryParseExact(end, "H:mm:ss", null, System.Globalization.DateTimeStyles.None, out var endTime);
 
-                if (!success)
+                if (!startSuccess || !endSuccess)
                 {
                     TempData["error"] = "Invalid start or end time format (must have format H:mm:ss).";
+                    return RedirectToAction("Index");
+                }
+                else if ((endTime - startTime).TotalMinutes % TimeSpan.FromHours(24).TotalMinutes < 1)
+                {
+                    TempData["error"] = "The range from start time to end time must be greater than 1 minute.";
                     return RedirectToAction("Index");
                 }
                 else
