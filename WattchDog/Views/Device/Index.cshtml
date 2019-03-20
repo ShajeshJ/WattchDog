@@ -21,6 +21,14 @@
         }
     </div>
 
+    <div class="row" style="margin-top:5px">
+        @using (Html.BeginForm("Index", "Device", FormMethod.Get))
+        {
+            <span>@Html.TextBox("search", null, new { @placeholder = "Name or MAC" })</span>
+            <span><input class="btn btn-primary" type="submit" value="Search"></span>
+        }
+    </div>
+
     <hr />
 
     <div class="row">

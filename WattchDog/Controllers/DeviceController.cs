@@ -17,12 +17,13 @@ namespace WattchDog.Controllers
     public class DeviceController : Controller
     {
         [HttpGet]
-        public ActionResult Index()
+        public ActionResult Index(string search = null)
         {
             ViewBag.Title = "WattchDog - Devices";
+            search = string.IsNullOrWhiteSpace(search) ? null : search;
 
             var repo = new TempRepo();
-            var devices = repo.GetAllDevices(d => d.UserId, Session["UID"]).Result.Select(d => (DeviceViewModel)d);
+            var devices = repo.GetAllDevices(d => d.UserId, Session["UID"], search).Result.Select(d => (DeviceViewModel)d);
 
             return View(devices);
         }

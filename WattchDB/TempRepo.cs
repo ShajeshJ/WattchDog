@@ -101,7 +101,7 @@ namespace WattchDB
             return result;
         }
 
-        public async Task<IEnumerable<Device>> GetAllDevices(string column = null, object value = null)
+        public async Task<IEnumerable<Device>> GetAllDevices(string column = null, object value = null, string search = null)
         {
             List<Device> result = new List<Device>();
 
@@ -124,6 +124,15 @@ namespace WattchDB
                     cmd.CommandText += " WHERE " + column + " = @value";
                     cmd.Parameters.AddWithValue("@value", value);
                 }
+
+                if (search != null)
+                {
+                    cmd.CommandText += (column == null) ? " WHERE (" : " AND (";
+                    cmd.CommandText += "mac_address LIKE @search OR name LIKE @search)";
+                    cmd.Parameters.AddWithValue("@search", $"%{search.Replace("%", "\\%").Replace("_", "\\_")}%");
+                }
+
+                cmd.CommandText += " ORDER BY name ASC";
 
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
@@ -157,13 +166,13 @@ namespace WattchDB
             return result;
         }
 
-        public async Task<IEnumerable<Device>> GetAllDevices<TProperty>(Expression<Func<Device, TProperty>> property, object value)
+        public async Task<IEnumerable<Device>> GetAllDevices<TProperty>(Expression<Func<Device, TProperty>> property, object value, string search)
         {
             var propertyInfo = ((MemberExpression)property.Body).Member as PropertyInfo;
             var colAttr = (SqlColumnAttribute)propertyInfo.GetCustomAttribute(typeof(SqlColumnAttribute), false);
             var column = colAttr.Column;
 
-            var result = await GetAllDevices(column, value);
+            var result = await GetAllDevices(column, value, search);
             return result;
         }
 
