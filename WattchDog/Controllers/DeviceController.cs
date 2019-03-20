@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Web;
 using System.Web.Mvc;
 using WattchDB;
@@ -177,9 +178,7 @@ namespace WattchDog.Controllers
             }
 
             var repo = new TempRepo();
-
             var aggregatetdData = new HourlyDataViewModel();
-
             var device = repo.GetDevice("mac_address", macaddress).Result;
 
             if (device.UserId != Session["UID"] as int?)
@@ -189,37 +188,51 @@ namespace WattchDog.Controllers
 
             aggregatetdData.Device = (DeviceViewModel)device;
 
-            var curTime = TimeZoneInfo.ConvertTime(DateTime.Now, 
+            var queryTime = TimeZoneInfo.ConvertTime(DateTime.Now, 
                 TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
-            var data = repo.GetAggregatedData(table, device.ID, curTime, DateGrouping.Hourly).Result.Reverse().ToList();
 
-            var outputData = new List<HourlyDatapointViewModel>();
-            curTime = new DateTime(curTime.Year, curTime.Month, curTime.Day, curTime.Hour, 0, 0);
-            var refTime = new DateTime(curTime.Year, curTime.Month, curTime.Day, curTime.Hour, 0, 0).AddDays(-1);
+            List<HourlyDatapointViewModel> outputData;
+            var curTime = new DateTime(queryTime.Year, queryTime.Month, queryTime.Day, queryTime.Hour, 0, 0);
+            var refTime = new DateTime(queryTime.Year, queryTime.Month, queryTime.Day, queryTime.Hour, 0, 0).AddDays(-1);
+            
+            var cache = MemoryCache.Default;
+            var key = $"{macaddress.ToUpper()}-{type.ToString()}-{curTime.ToString()}-hourly";
 
-            while (refTime < curTime)
+            if (cache.Contains(key))
             {
-                if (data.ElementAtOrDefault(0)?.GroupedDate == refTime)
+                outputData = (List<HourlyDatapointViewModel>)cache[key];
+            }
+            else
+            {
+                outputData = new List<HourlyDatapointViewModel>();
+                var data = repo.GetAggregatedData(table, device.ID, queryTime, DateGrouping.Hourly).Result.Reverse().ToList();
+
+                while (refTime < curTime)
                 {
-                    outputData.Add(new HourlyDatapointViewModel()
+                    if (data.ElementAtOrDefault(0)?.GroupedDate == refTime)
                     {
-                        Hour = data[0].GroupedDate,
-                        NumSamples = data[0].NumSamples,
-                        Value = type == DeviceDataType.EnergyUsage ? Math.Round(data[0].AvgValue, 7) : Math.Round(data[0].AvgValue, 2)
-                    });
-                    data.RemoveAt(0);
-                }
-                else
-                {
-                    outputData.Add(new HourlyDatapointViewModel()
+                        outputData.Add(new HourlyDatapointViewModel()
+                        {
+                            Hour = data[0].GroupedDate,
+                            NumSamples = data[0].NumSamples,
+                            Value = type == DeviceDataType.EnergyUsage ? Math.Round(data[0].AvgValue, 7) : Math.Round(data[0].AvgValue, 2)
+                        });
+                        data.RemoveAt(0);
+                    }
+                    else
                     {
-                        Hour = refTime,
-                        NumSamples = 0,
-                        Value = 0
-                    });
+                        outputData.Add(new HourlyDatapointViewModel()
+                        {
+                            Hour = refTime,
+                            NumSamples = 0,
+                            Value = 0
+                        });
+                    }
+
+                    refTime = refTime.AddHours(1);
                 }
 
-                refTime = refTime.AddHours(1);
+                cache.Add(key, outputData, DateTimeOffset.Now.AddMinutes(5));
             }
 
             aggregatetdData.Data = outputData;
@@ -255,9 +268,7 @@ namespace WattchDog.Controllers
             }
 
             var repo = new TempRepo();
-
             var aggregatetdData = new DailyDataViewModel();
-
             var device = repo.GetDevice("mac_address", macaddress).Result;
 
             if (device.UserId != Session["UID"] as int?)
@@ -267,37 +278,51 @@ namespace WattchDog.Controllers
 
             aggregatetdData.Device = (DeviceViewModel)device;
 
-            var curTime = TimeZoneInfo.ConvertTime(DateTime.Now,
+            var queryTime = TimeZoneInfo.ConvertTime(DateTime.Now,
                 TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
-            var data = repo.GetAggregatedData(table, device.ID, curTime, DateGrouping.Daily).Result.Reverse().ToList();
 
-            var outputData = new List<DailyDatapointViewModel>();
-            curTime = new DateTime(curTime.Year, curTime.Month, curTime.Day);
-            var refTime = new DateTime(curTime.Year, curTime.Month, curTime.Day).AddMonths(-1);
+            List<DailyDatapointViewModel> outputData;
+            var curTime = new DateTime(queryTime.Year, queryTime.Month, queryTime.Day);
+            var refTime = new DateTime(queryTime.Year, queryTime.Month, queryTime.Day).AddMonths(-1);
 
-            while (refTime < curTime)
+            var cache = MemoryCache.Default;
+            var key = $"{macaddress.ToUpper()}-{type.ToString()}-{curTime.ToString()}-daily";
+
+            if (cache.Contains(key))
             {
-                if (data.ElementAtOrDefault(0)?.GroupedDate == refTime)
+                outputData = (List<DailyDatapointViewModel>)cache[key];
+            }
+            else
+            {
+                outputData = new List<DailyDatapointViewModel>();
+                var data = repo.GetAggregatedData(table, device.ID, queryTime, DateGrouping.Daily).Result.Reverse().ToList();
+
+                while (refTime < curTime)
                 {
-                    outputData.Add(new DailyDatapointViewModel()
+                    if (data.ElementAtOrDefault(0)?.GroupedDate == refTime)
                     {
-                        Date = data[0].GroupedDate,
-                        NumSamples = data[0].NumSamples,
-                        Value = type == DeviceDataType.EnergyUsage ? Math.Round(data[0].AvgValue, 7) : Math.Round(data[0].AvgValue, 2)
-                    });
-                    data.RemoveAt(0);
-                }
-                else
-                {
-                    outputData.Add(new DailyDatapointViewModel()
+                        outputData.Add(new DailyDatapointViewModel()
+                        {
+                            Date = data[0].GroupedDate,
+                            NumSamples = data[0].NumSamples,
+                            Value = type == DeviceDataType.EnergyUsage ? Math.Round(data[0].AvgValue, 7) : Math.Round(data[0].AvgValue, 2)
+                        });
+                        data.RemoveAt(0);
+                    }
+                    else
                     {
-                        Date = refTime,
-                        NumSamples = 0,
-                        Value = 0
-                    });
+                        outputData.Add(new DailyDatapointViewModel()
+                        {
+                            Date = refTime,
+                            NumSamples = 0,
+                            Value = 0
+                        });
+                    }
+
+                    refTime = refTime.AddDays(1);
                 }
 
-                refTime = refTime.AddDays(1);
+                cache.Add(key, outputData, DateTimeOffset.Now.AddMinutes(5));
             }
 
             aggregatetdData.Data = outputData;
@@ -333,9 +358,7 @@ namespace WattchDog.Controllers
             }
 
             var repo = new TempRepo();
-
             var aggregatetdData = new MonthlyDataViewModel();
-
             var device = repo.GetDevice("mac_address", macaddress).Result;
 
             if (device.UserId != Session["UID"] as int?)
@@ -345,37 +368,51 @@ namespace WattchDog.Controllers
 
             aggregatetdData.Device = (DeviceViewModel)device;
 
-            var curTime = TimeZoneInfo.ConvertTime(DateTime.Now,
+            var queryTime = TimeZoneInfo.ConvertTime(DateTime.Now,
                 TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
-            var data = repo.GetAggregatedData(table, device.ID, curTime, DateGrouping.Monthly).Result.Reverse().ToList();
 
-            var outputData = new List<MonthlyDatapointViewModel>();
-            curTime = new DateTime(curTime.Year, curTime.Month, 1);
-            var refTime = new DateTime(curTime.Year, curTime.Month, curTime.Day).AddYears(-1);
+            List<MonthlyDatapointViewModel> outputData;
+            var curTime = new DateTime(queryTime.Year, queryTime.Month, 1);
+            var refTime = new DateTime(queryTime.Year, queryTime.Month, 1).AddYears(-1);
 
-            while (refTime < curTime)
+            var cache = MemoryCache.Default;
+            var key = $"{macaddress.ToUpper()}-{type.ToString()}-{curTime.ToString()}-monthly";
+
+            if (cache.Contains(key))
             {
-                if (data.ElementAtOrDefault(0)?.GroupedDate == refTime)
+                outputData = (List<MonthlyDatapointViewModel>)cache[key];
+            }
+            else
+            {
+                outputData = new List<MonthlyDatapointViewModel>();
+                var data = repo.GetAggregatedData(table, device.ID, queryTime, DateGrouping.Monthly).Result.Reverse().ToList();
+
+                while (refTime < curTime)
                 {
-                    outputData.Add(new MonthlyDatapointViewModel()
+                    if (data.ElementAtOrDefault(0)?.GroupedDate == refTime)
                     {
-                        Month = data[0].GroupedDate,
-                        NumSamples = data[0].NumSamples,
-                        Value = type == DeviceDataType.EnergyUsage ? Math.Round(data[0].AvgValue, 7) : Math.Round(data[0].AvgValue, 2)
-                    });
-                    data.RemoveAt(0);
-                }
-                else
-                {
-                    outputData.Add(new MonthlyDatapointViewModel()
+                        outputData.Add(new MonthlyDatapointViewModel()
+                        {
+                            Month = data[0].GroupedDate,
+                            NumSamples = data[0].NumSamples,
+                            Value = type == DeviceDataType.EnergyUsage ? Math.Round(data[0].AvgValue, 7) : Math.Round(data[0].AvgValue, 2)
+                        });
+                        data.RemoveAt(0);
+                    }
+                    else
                     {
-                        Month = refTime,
-                        NumSamples = 0,
-                        Value = 0
-                    });
+                        outputData.Add(new MonthlyDatapointViewModel()
+                        {
+                            Month = refTime,
+                            NumSamples = 0,
+                            Value = 0
+                        });
+                    }
+
+                    refTime = refTime.AddMonths(1);
                 }
 
-                refTime = refTime.AddMonths(1);
+                cache.Add(key, outputData, DateTimeOffset.Now.AddMinutes(5));
             }
 
             aggregatetdData.Data = outputData;
